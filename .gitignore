@@ -1,0 +1,88 @@
+# Auto Claude data directory
+.auto-claude/
+
+# Auto Claude generated files
+.auto-claude-security.json
+.auto-claude-status
+.claude_settings.json
+.worktrees/
+.security-key
+logs/security/
+
+# ─────────────────────────────────────────────
+# Claude Code — .core/commands/ kaynak, .claude/commands/ kopya
+# NOT: .claude/commands/ git'te takip edilir (bootstrap için gerekli —
+#      fresh clone'da /core-setup komutu hemen kullanılabilir olsun)
+# Güncelleme için: /core-sync
+# ─────────────────────────────────────────────
+# .claude/commands/  ← gitignore'dan kaldırıldı, tracked
+
+# .github/copilot-instructions.md → git'te takip edilir (generic bootstrap)
+# /core-setup, domain bilgilerini bu dosyaya ekler; commit etmek isteğe bağlı.
+.vscode/mcp.json
+
+# ─────────────────────────────────────────────
+# CORE — Kullanıcı/Şirket Verisi (Git'e commit ETME)
+# Bu dosyalar /core-setup kurulumu ve agent çalışmaları sırasında otomatik dolar.
+# Şirket-özel, analist-özel veya runtime veri içerirler.
+# ─────────────────────────────────────────────
+
+# Sistem konfigürasyonu — Atlassian URL, domain, kalite eşikleri içerir
+config/system.yaml
+
+# Analiz çıktıları — iş verileri içerir
+core-output/
+
+# Knowledge base — repo tarama çıktıları (şirket kodu/mimarisi içerir)
+knowledge-base/
+
+# Domain pack'ler — şirkete özel servis listesi, regülasyon, board bilgisi içerir
+# Not: /domains/ (root-anchored) — .core/domains/_template/ etkilenmez
+/domains/
+
+# ─────────────────────────────────────────────
+# CORE — Kurumsal Hafıza (Runtime — Git'e commit ETME)
+# ─────────────────────────────────────────────
+
+# Kurumsal karar günlüğü — analizlerden biriken kararlar (template git'te kalır)
+memory/decisions/institutional-memory.md
+!memory/decisions/template.md
+
+# TBD tracker — projeye özgü açık maddeler (template git'te kalır)
+memory/tbd-tracker/tbd-tracker.md
+!memory/tbd-tracker/template.md
+
+# Feedback ve iyileştirme logları — analist değerlendirmeleri (template'ler git'te kalır)
+memory/feedback/feedback-log.md
+!memory/feedback/template.md
+memory/agent-improvements/improvement-list.md
+!memory/agent-improvements/template.md
+
+# Prompt versiyon geçmişi ve A/B testler — /core-optimize çıktısı
+memory/prompt-versions/changelog.md
+memory/prompt-versions/ab-tests/ab-test-log.md
+
+# Kişisel analist profilleri — template dosyası repository'de kalır
+memory/personal/*.md
+!memory/personal/template.md
+
+# ─────────────────────────────────────────────
+# Python
+# ─────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyc
+.venv/
+venv/
+env/
+.env
+
+# ─────────────────────────────────────────────
+# IDE
+# ─────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
