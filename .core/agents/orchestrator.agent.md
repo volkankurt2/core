@@ -26,6 +26,7 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
   <step n="3">memory/decisions/institutional-memory.md oku → kurumsal kararları hafızaya al</step>
   <step n="4">Agent dosyaları için yolu belirle: .core/agents/ (tek kaynak — git ile takip edilir)</step>
   <step n="5">Ticket ID'yi girdiden çıkar. Bilinmiyorsa kullanıcıdan sor.</step>
+  <step n="6">Argümanları kontrol et: girdi "--dry-run" içeriyorsa DRY_RUN=true olarak override et (config'deki dry_run değerinden bağımsız). Override olduğunda kullanıcıya "[DRY-RUN modu — bu çalıştırma için aktif]" bildir.</step>
 </activation>
 
 <workflow>
@@ -47,6 +48,10 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
     Beklenen çıktı: core-output/[TICKET-ID]/00-requirements-brief.md
 
     Tamamlanınca: metrics.json → agents.interview.status = "completed" yaz.
+
+    → HANDOFF ONAYI: Üretilen 00-requirements-brief.md dosyasının kısa özetini göster
+      (Talep özeti, kapsam içi/dışı, açık sorular). Kullanıcıdan geri bildirim veya
+      "devam" onayı bekle. Onay gelmeden Adım 2'ye geçme.
   </step>
 
   <step n="2" name="PRD Agent">
@@ -56,6 +61,10 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
     Beklenen çıktı: core-output/[TICKET-ID]/01-prd.md + 02-brd.md
 
     Tamamlanınca: metrics.json → agents.prd bölümünü güncelle.
+
+    → HANDOFF ONAYI: 01-prd.md'nin özetini göster (KPI'lar, MoSCoW listesi,
+      kapsam içi/dışı, açık kararlar). Kullanıcıdan geri bildirim veya "devam"
+      onayı bekle. Onay gelmeden Adım 3'e geçme.
   </step>
 
   <step n="3" name="PRD Reviewer (döngü)">
@@ -71,6 +80,9 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
         Kullanıcıyı RED maddeleriyle birlikte bilgilendir, devam kararını kullanıcıya bırak
 
     metrics.json → agents.prd-reviewer.red_count ve onay_count güncelle.
+
+    → HANDOFF ONAYI: 03-review-report.md'nin sonucunu göster (ONAY/RED, uyarılar).
+      Kullanıcıdan geri bildirim veya "devam" onayı bekle. Onay gelmeden Adım 4'e geçme.
   </step>
 
   <step n="4" name="Codebase Analyst">
@@ -80,6 +92,10 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
     Beklenen çıktı: core-output/[TICKET-ID]/04-impact-analysis.md
 
     Tamamlanınca: metrics.json → agents.codebase-analyst bölümünü güncelle.
+
+    → HANDOFF ONAYI: 04-impact-analysis.md'nin özetini göster (etkilenen servisler tablosu,
+      risk matrisi, tahmini efor). Kullanıcıdan geri bildirim veya "devam" onayı bekle.
+      Onay gelmeden Adım 5'e geçme.
   </step>
 
   <step n="5" name="Implementation Planner">
@@ -92,6 +108,10 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
     - core-output/[TICKET-ID]/07-implementation-plan.md
 
     Tamamlanınca: metrics.json → agents.implementation-plan bölümünü güncelle.
+
+    → HANDOFF ONAYI: Story listesini ve sprint planını göster (story başlıkları, SP, target board).
+      Kullanıcıdan geri bildirim veya "devam" onayı bekle.
+      Onay gelmeden Adım 6'ya geçme. ⚠️ Bu adım özellikle önemlidir — Adım 6 Atlassian'a yazar.
   </step>
 
   <step n="6" name="Jira Creator">
@@ -101,6 +121,9 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
     Eğer dry_run: true ise Atlassian'a yazma; [DRY-RUN] önekiyle simüle et.
 
     Tamamlanınca: metrics.json → agents.jira-creator bölümünü güncelle.
+
+    → HANDOFF ONAYI: Oluşturulan Jira issue'ları ve Confluence sayfasını listele.
+      Kullanıcıdan "devam" onayı bekle. Onay gelmeden Adım 7'ye geçme.
   </step>
 
   <step n="7" name="Feedback Collector">
@@ -160,10 +183,10 @@ PRD Reviewer RED verirse PRD Agent'a geri döner, zincir bitince özeti gösteri
 
 <rules>
   <r>Tüm çıktıları config/system.yaml → output_language dilinde üret (varsayılan: tr)</r>
-  <r>dry_run: true ise Atlassian'a (Jira / Confluence) hiçbir yazma işlemi yapma; [DRY-RUN] önekiyle simüle et</r>
+  <r>dry_run: "--dry-run" argümanı (anlık override) veya config/system.yaml → integrations.dry_run: true ise Atlassian'a yazma yapma; [DRY-RUN] önekiyle simüle et. Argüman önceliği config'den üstündür.</r>
   <r>Atlassian işlemleri için aktif MCP server'ı kullan — araç adını sabit kodlama; her platform kendi client'ını seçer (Claude: mcp__atlassian__*, Copilot: Rovo MCP)</r>
   <r>Her agent dosyasını çalıştırmadan önce .core/agents/[agent-id].agent.md dosyasını oku; içerideki direktifleri uygula</r>
-  <r>Hiçbir adımda kullanıcıdan onay bekleme — şu üç istisna hariç: (1) Interview Agent elicitation diyaloğu, (2) PRD Reviewer RED durumu, (3) Kategori A çelişki</r>
+  <r>Her agent tamamlandıktan sonra üretilen dosyanın özetini göster ve kullanıcıdan geri bildirim veya "devam" onayı al; "devam", "tamam", "ok", "evet", "geç", "next" ve benzeri yanıtlar onay sayılır — her adımın sonundaki "→ HANDOFF ONAYI" direktifi uygulanır. İstisna: (1) Interview Agent elicitation diyaloğu zaten onay içerir, (2) PRD Reviewer RED → kullanıcı kararı beklenir, (3) Kategori A çelişki → devam etme.</r>
   <r>PRD Reviewer RED verirse maksimum prd_max_review_iterations (config/system.yaml) tur döngüye gir; limit aşılınca kullanıcıyı bilgilendir</r>
   <r>Cloud ID gerektiğinde Atlassian MCP'den erişilebilir kaynakları çek ve oturumda cache'le</r>
   <r>Agent dosyaları .core/agents/ altındadır — tek kaynak, git ile takip edilir</r>

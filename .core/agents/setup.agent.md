@@ -134,8 +134,21 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
        → MAX_ITER
   </step>
 
-  <step n="8" name="Dosyaları Yaz">
-    8a. config/system.yaml yaz:
+  <step n="8" name="Entegrasyon Ayarları">
+    Kullanıcıya: "Analiz sonuçları Jira ve Confluence'a yazılsın mı?"
+    Mevcut dry_run varsa göster; Enter ile korunsun.
+
+    Seçenekler:
+      1) Gerçek mod (dry_run: false) — Jira ticket ve Confluence sayfası oluşturulur [varsayılan]
+      2) Kuru çalışma (dry_run: true) — Hiçbir şey yazılmaz, [DRY-RUN] önekiyle simüle edilir
+
+    Not: "/core-analyze TICKET --dry-run" argümanıyla da anlık override yapılabilir.
+
+    Seçimi DRY_RUN değişkenine kaydet: true / false
+  </step>
+
+  <step n="9" name="Dosyaları Yaz">
+    9a. config/system.yaml yaz:
     ```yaml
     # CORE Sistem Konfigürasyonu
     # Son güncelleme: [tarih] — /core-setup ile yapılandırıldı
@@ -159,7 +172,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     chain_mode: auto_handoff
 
     integrations:
-      dry_run: false
+      dry_run: [DRY_RUN]
       jira:
         enabled: true
       confluence:
@@ -168,9 +181,9 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     export:
       version: '2.0'
     ```
-    Mevcut dosya varsa: dry_run, jira.enabled, confluence.enabled değerlerini mevcut değerlerden koru.
+    Mevcut dosya varsa: jira.enabled, confluence.enabled değerlerini mevcut değerlerden koru. dry_run için Adım 8'deki DRY_RUN değerini kullan.
 
-    8b. domains/[DOMAIN_ID]/domain-context.yaml:
+    9b. domains/[DOMAIN_ID]/domain-context.yaml:
     - Dosya YOKSA: şablonu oluştur (aşağıdaki şablon)
     - Dosya VARSA: sadece display_name, description, jira_project, confluence_space alanlarını güncelle
       services, regulations, collaborating_boards, prd_review_extra_criteria, test_scenario_templates, glossary alanlarına DOKUNMA
@@ -201,7 +214,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     glossary: []
     ```
 
-    8c. memory/personal/[ANALYST_NAME].md (sadece yeni analist için, mevcut değilse):
+    9c. memory/personal/[ANALYST_NAME].md (sadece yeni analist için, mevcut değilse):
     ```markdown
     analyst_id: [ANALYST_NAME]
     role: [ANALYST_ROLE]
@@ -214,7 +227,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     # (Analize göre CORE tarafından güncellenir)
     ```
 
-    8d. Her platform için .github/copilot-instructions.md'ye "Aktif Konfigürasyon" bölümü ekle
+    9d. Her platform için .github/copilot-instructions.md'ye "Aktif Konfigürasyon" bölümü ekle
     (Copilot seçilmişse zorunlu; diğer platformlarda opsiyonel — "Ekleyeyim mi?" diye sor):
 
     .github/copilot-instructions.md dosyasını oku (varsa). Dosyanın sonuna şu bölümü EKLE (replace etme):
@@ -236,7 +249,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     Not: Dosya yoksa .github/ klasörünü oluştur, önce mevcut generic template'i doldur.
     Not: Token bilgisi bu dosyaya yazılmaz — sadece domain/proje bilgileri eklenir.
 
-    8e. Hafıza dosyalarını şablondan oluştur (sadece yoksa):
+    9e. Hafıza dosyalarını şablondan oluştur (sadece yoksa):
     Her dosya için: ilgili template.md'yi oku → hedef dosya YOKSA kopyala → varsa DOKUNMA.
 
     | Kaynak (template)                              | Hedef                                         |
@@ -250,7 +263,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     Zaten varsa: "— [dosya adı] mevcut, korundu" yaz.
   </step>
 
-  <step n="9" name="MCP Kurulum Talimatları">
+  <step n="10" name="MCP Kurulum Talimatları">
     Platform'a göre exact MCP talimatlarını göster.
     Token'ı kullanıcının girdiği ATLASSIAN_TOKEN değeriyle doldur.
     Not: agent bu bilgileri file'a yazmaz, sadece kullanıcıya gösterir.
@@ -314,7 +327,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     İlk bağlantıda tarayıcıda Atlassian OAuth girişi yapmanız istenecek.
   </step>
 
-  <step n="10" name="Eksik Adımları Listele">
+  <step n="11" name="Eksik Adımları Listele">
     Şu kontrolleri yap:
 
     a) domains/[DOMAIN_ID]/domain-context.yaml → collaborating_boards boş mu?
@@ -324,7 +337,9 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
        - Yoksa: "⚠ Servis KB'si oluşturulmamış → /rk-scan [repo-url] çalıştırın"
 
     c) domains/[DOMAIN_ID]/domain-context.yaml → services boş mu?
-       - Boşsa: "⚠ Domain servis listesi boş → domains/[DOMAIN_ID]/domain-context.yaml → services bölümünü doldurun"
+       - Boşsa VE knowledge-base/*.json YOKSA: "⚠ Domain servis listesi boş → /rk-scan [repo-url] çalıştırın, sonra /core-setup-boards services bölümünü otomatik doldurur"
+       - Boşsa VE knowledge-base/*.json VARSA: "⚠ Domain servis listesi boş → /core-setup-boards çalıştırın (KB mevcut, servisler otomatik doldurulacak)"
+       - Doluysa: kontrol geçti
 
     Eksik yoksa: "✅ Tüm adımlar tamamlandı — /core-analyze [TICKET] ile başlayabilirsiniz"
 
