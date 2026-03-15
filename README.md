@@ -35,19 +35,20 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
         ↓
   Interview Agent        → 00-requirements-brief.md
   [Çelişki kontrolü ✓]
-        ↓ handoff
+        ↓ ✋ Handoff Onayı — özet gösterilir, kullanıcı onayı beklenir
   PRD Agent              → 01-prd.md + 02-brd.md
   [Halüsinasyon doğrulama ✓]
-        ↓ handoff
+        ↓ ✋ Handoff Onayı
   PRD Reviewer           → 03-review-report.md
    ONAY ↓   ↑ RED (maks 2 iterasyon)
+        ↓ ✋ Handoff Onayı
   Codebase Analyst       → 04-impact-analysis.md
   [knowledge-base/*.json kaynak olarak kullanır]
-        ↓ handoff
+        ↓ ✋ Handoff Onayı
   Implementation Planner → 05-user-stories.md + 06-test-scenarios.md + 07-implementation-plan.md
-        ↓ handoff
+        ↓ ✋ Handoff Onayı (Atlassian yazma öncesi kritik)
   Jira Creator           → Jira backlog + Confluence BRD sayfası
-        ↓
+        ↓ ✋ Handoff Onayı
   Feedback Collector     → Analist puanlaması + kurumsal hafıza güncelleme
 ```
 
@@ -57,7 +58,7 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 | 2 | **PRD Agent** | `01-prd.md` + `02-brd.md` |
 | 3 | **PRD Reviewer** | `03-review-report.md` (ONAY / RED) |
 | 4 | **Codebase Analyst** | `04-impact-analysis.md` |
-| 5 | **Implementation Planner** | `05-user-stories.md` + `07-implementation-plan.md` |
+| 5 | **Implementation Planner** | `05-user-stories.md` + `06-test-scenarios.md` + `07-implementation-plan.md` |
 | 6 | **Jira Creator** | Jira ticket'ları + Confluence sayfası |
 | 7 | **Feedback Collector** | `memory/` güncellenir |
 
@@ -82,12 +83,19 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 
 | # | Agent | Çıktı |
 |---|-------|-------|
-| 8 | **Repo Scanner** | `knowledge-base/[servis].json` — servis tüm detaylarıyla |
-| 9 | **Ecosystem Mapper** | `knowledge-base/_ecosystem_map.json` — cross-repo harita |
-| 10 | **Dev Advisor** | Anlık geliştirici yönlendirmesi |
-| 11 | **Setup Agent** | `config/system.yaml`, `domains/*/domain-context.yaml` — kurulum |
-| 12 | **Prompt Optimizer** | `.core/agents/*.agent.md` — agent kalitesini iyileştirme |
-| 13 | **Orchestrator** | Tüm analiz zincirini uçtan uca yönetir |
+| 1 | **Orchestrator** | Tüm analiz zincirini uçtan uca yönetir |
+| 2 | **Interview Agent** | `00-requirements-brief.md` |
+| 3 | **PRD Agent** | `01-prd.md` + `02-brd.md` |
+| 4 | **PRD Reviewer** | `03-review-report.md` |
+| 5 | **Codebase Analyst** | `04-impact-analysis.md` |
+| 6 | **Implementation Planner** | `05-user-stories.md` + `06-test-scenarios.md` + `07-implementation-plan.md` |
+| 7 | **Jira Creator** | Jira ticket'ları + Confluence sayfası |
+| 8 | **Feedback Collector** | `memory/` güncellenir |
+| 9 | **Setup Agent** | `config/system.yaml`, `domains/*/domain-context.yaml` |
+| 10 | **Prompt Optimizer** | `.core/agents/*.agent.md` — agent kalitesini iyileştirme |
+| 11 | **Repo Scanner** | `knowledge-base/[servis].json` — servis tüm detaylarıyla |
+| 12 | **Ecosystem Mapper** | `knowledge-base/_ecosystem_map.json` — cross-repo harita |
+| 13 | **Dev Advisor** | Anlık geliştirici yönlendirmesi |
 
 ---
 
@@ -211,12 +219,13 @@ Komutlar platforma göre farklı mekanizma kullanır — içerik aynı, format f
 | `/core-excel [ticket]` | — | Teknik etki matrisi (Excel) |
 | `/core-optimize [agent?]` | — | Agent prompt'larını optimize et |
 | `/core-analytics [N\|ticket]` | — | Performans metrikleri |
+| `/core-help` | `#core-help` | Mevcut durumu analiz et, sonraki adımı öner |
 | `/core-setup` | `#core-setup` | Kurulum sihirbazı |
 | `/core-setup-boards` | `#core-setup-boards` | Jira board keşfi |
+| `/core-update` | — | CORE framework'ünü güvenli güncelle |
 | `/rk-scan [repo-url]` | `#rk-scan` | Repo tara → knowledge-base |
 | `/rk-map` | `#rk-map` | Ekosistem haritası üret |
 | `/rk-advise [görev]` | `#rk-advise` | Geliştirici yönlendirmesi |
-| — | `#core-help` | Durum ve yardım |
 
 > **Claude Code:** `.claude/commands/` altındaki dosyalar slash komutu olarak görünür.
 > **Copilot:** `.github/prompts/` altındaki `.prompt.md` dosyaları `#` ile çağrılır.
@@ -355,16 +364,17 @@ CORE/
 │
 ├── .core/                                 ← Tek kaynak — git'te versiyonlanır
 │   ├── agents/                            ← 13 agent (.agent.md)
-│   │   ├── interview.agent.md             ← Analiz zinciri (9 agent)
+│   │   ├── orchestrator.agent.md          ← Zincir yöneticisi
+│   │   ├── interview.agent.md             ← Analiz zinciri
 │   │   ├── prd.agent.md
 │   │   ├── prd-reviewer.agent.md
 │   │   ├── codebase-analyst.agent.md
-│   │   ├── implementation-planner.agent.md
+│   │   ├── implementation-plan.agent.md
 │   │   ├── jira-creator.agent.md
 │   │   ├── feedback-collector.agent.md
-│   │   ├── pptx-generator.agent.md
-│   │   ├── excel-generator.agent.md
-│   │   ├── repo-scanner.agent.md          ← RK zinciri (3 agent)
+│   │   ├── prompt-optimizer.agent.md
+│   │   ├── setup.agent.md
+│   │   ├── repo-scanner.agent.md          ← RK zinciri
 │   │   ├── ecosystem-mapper.agent.md
 │   │   └── dev-advisor.agent.md
 │   │
