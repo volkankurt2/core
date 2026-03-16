@@ -2,4 +2,4 @@
 # Kullanım: /core-setup
 
 .core/agents/setup.agent.md dosyasını oku.
-<activation>, <workflow>, <rules> bloklarını adım adım uygula.
+Tüm <activation>, <workflow>, <rules> bloklarını adım adım uygula.
