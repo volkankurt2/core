@@ -12,7 +12,28 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
 <activation>
   <step n="1">~/.core/config/system.yaml var mı kontrol et → varsa oku, mevcut değerleri hafızaya al</step>
-  <step n="2">Mevcut değerleri kullanıcıya göster: "Mevcut kurulum tespit edildi — sadece güncellemek istediğin adımlar uygulanacak."</step>
+  <step n="2">
+    Mevcut değerler VARSA — kuruluma başlamadan önce özet tablo göster:
+
+    ```
+    ── Mevcut Kurulum ─────────────────────────────────
+    Platform       : [platform]
+    Domain         : [domain_id] ([domain_display])
+    Atlassian URL  : [jira_url]
+    Atlassian User : [jira_user]
+    Jira Projesi   : [jira_project]
+    Confluence     : [confluence_space]
+    Çıktı Dili     : [output_language]
+    Dry Run        : [dry_run]
+    ───────────────────────────────────────────────────
+    ```
+
+    Sonra sor: "Devam etmek, değiştirmek istediğin bir alan var mı? (E/h)"
+    - "h" veya "hayır" → kurulum tamamdır, çık
+    - "E" veya Enter → adım adım ilerle; her alanda mevcut değeri önce göster, Enter ile koru
+
+    Eksik alan varsa (örn. atlassian_url boş) otomatik o adımdan başla.
+  </step>
   <step n="3">~/.core/config/system.yaml yoksa: "İlk kuruluma başlıyoruz." mesajı göster</step>
 </activation>
 
@@ -54,12 +75,14 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
     Mevcut platform varsa önce göster, Enter ile korunabilsin.
     Seçimi PLATFORM değişkenine kaydet: cli / desktop / vscode / copilot
+    → Hemen kaydet: ~/.core/config/system.yaml içindeki `platform` alanını güncelle (dosya yoksa oluştur).
   </step>
 
   <step n="3" name="Çıktı Dili">
     Sor: "Çıktı dili (tr/en)?"
     Mevcut output_language varsa göster, Enter ile korunsun.
     OUTPUT_LANG değişkenine kaydet.
+    → Hemen kaydet: `output_language` alanını güncelle.
   </step>
 
   <step n="4" name="Atlassian Bilgileri">
@@ -85,6 +108,9 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
        - Genellikle Jira proje anahtarıyla aynı
        - Mevcut confluence_space varsa göster
        - CONFLUENCE_KEY değişkenine kaydet
+
+    → Her alt alan girilince hemen kaydet: domain-context.yaml içindeki jira_project / confluence_space güncelle.
+      (Token dosyaya yazılmaz — sadece MCP adımında kullanıcıya gösterilir.)
   </step>
 
   <step n="5" name="Domain Bilgileri">
@@ -97,6 +123,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     c) Açıklama (kısa, 1-2 cümle) → DOMAIN_DESC
 
     Mevcut active_domain ve domain-context.yaml değerleri varsa göster.
+    → Hemen kaydet: system.yaml `active_domain`, domain-context.yaml `domain/display_name/description` güncelle.
   </step>
 
   <step n="6" name="Analist Profili">
@@ -111,6 +138,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
     Analist adı girilirse → ANALYST_NAME
     Rol sor: "Analist rolü (örn: Senior Business Analyst)" → ANALYST_ROLE
+    → Hemen kaydet: ~/.core/memory/personal/[ANALYST_NAME].md oluştur (yoksa).
   </step>
 
   <step n="7" name="Kalite Eşikleri">
@@ -132,6 +160,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
        - Not: "Reviewer tarafından reddedildiğinde kaç kez yeniden yazılacağı."
        - Varsayılan: 2
        → MAX_ITER
+    → Hemen kaydet: system.yaml `hallucination_threshold`, `min_quality_score`, `prd_max_review_iterations` güncelle.
   </step>
 
   <step n="8" name="Entegrasyon Ayarları">
@@ -145,9 +174,12 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     Not: "/core-analyze TICKET --dry-run" argümanıyla da anlık override yapılabilir.
 
     Seçimi DRY_RUN değişkenine kaydet: true / false
+    → Hemen kaydet: system.yaml `integrations.dry_run` güncelle.
   </step>
 
   <step n="9" name="Dosyaları Yaz">
+    **Kaydetme kuralı:** Her adım tamamlandıkça (kullanıcı Enter'a basınca) o adımın verisi ~/.core/config/system.yaml ve ilgili dosyaya hemen yaz. Kurulum yarıda kesilse bile tamamlanan adımların verileri korunur.
+
     Tüm dosyalar ~/.core/ altına yazılır — proje klasörüne dokunulmaz.
     Klasör yoksa oluştur: ~/.core/config/, ~/.core/domains/, ~/.core/memory/
 
@@ -274,12 +306,9 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
     **CLI (claude):**
     ```
-    claude mcp add atlassian \
-      -e ATLASSIAN_URL="[ATLASSIAN_URL]" \
-      -e ATLASSIAN_USERNAME="[ATLASSIAN_USER]" \
-      -e ATLASSIAN_API_TOKEN="[ATLASSIAN_TOKEN]" \
-      -- npx -y @anthropic-ai/mcp-server-atlassian
+    claude mcp add --transport http atlassian https://mcp.atlassian.com/v1/mcp
     ```
+    Komutu çalıştırdıktan sonra tarayıcıda Atlassian OAuth girişi yapmanız istenecek.
 
     **Desktop:**
     `~/Library/Application Support/Claude/claude_desktop_config.json` dosyasına eklenecek JSON:
@@ -360,7 +389,8 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 - Atlassian API token'ı hiçbir zaman dosyaya yazma — sadece MCP talimatlarında kullanıcıya göster
 - Mevcut değerleri koru — sadece kullanıcının değiştirdiği alanları güncelle
 - domain-context.yaml güncellenirken services, regulations, collaborating_boards alanlarına dokunma
-- Her adımı tamamladıkça kullanıcıya onay ver (✓ config/system.yaml, ✓ domains/[domain]/...)
+- Her adımı tamamladıkça kullanıcıya onay ver (✓ config/system.yaml, ✓ domains/[domain]/...) VE ilgili dosyayı hemen yaz — kurulum yarıda kesilebilir
+- Kurulum başlarken mevcut değerleri özet tablo olarak göster; kullanıcı "hayır" derse adımları atla
 - Copilot platformunda .github/copilot-instructions.md'yi mutlaka üret
 - İdempotent çalış — aynı değerlerle tekrar çalıştırıldığında hiçbir şey bozulmamalı
 - Atlassian bilgileri girilmemişse MCP adımını atla, uyarı ver
