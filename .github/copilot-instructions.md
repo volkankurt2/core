@@ -8,21 +8,27 @@ formatında yazılmıştır. Her platform kendi MCP client'ını kullanır — a
 
 ---
 
-## Prompt Dosyaları (Slash Komut Eşdeğeri)
+## Agent Dosyaları
 
-`.github/prompts/` altındaki dosyalar Copilot Chat'te `#prompt-adı` ile çağrılır:
+`.github/agents/` altındaki dosyalar Copilot Chat'te `@agent-adı` ile çağrılır:
 
-| Prompt | Açıklama |
-|--------|----------|
-| `#core-analyze` | Standart analiz zinciri |
-| `#core-epic-analyze` | Epic ölçekli analiz |
-| `#rk-scan` | Repo tara → knowledge-base |
-| `#rk-map` | Ekosistem haritası üret |
-| `#rk-advise` | Geliştirici sorusu yanıtla |
-| `#core-setup` | Kurulum sihirbazı |
-| `#core-memory` | Kurumsal hafıza sorgusu |
-| `#core-setup-boards` | Jira board keşfi |
-| `#core-help` | Durum ve yardım |
+| Agent | Açıklama |
+|-------|----------|
+| `@core-analyze` | Standart analiz zinciri |
+| `@core-epic-analyze` | Epic ölçekli analiz |
+| `@core-tbd` | Açık TBD'leri listele / güncelle |
+| `@core-memory` | Kurumsal hafıza sorgusu |
+| `@core-setup` | Kurulum sihirbazı |
+| `@core-setup-boards` | Jira board keşfi |
+| `@core-optimize` | Agent prompt optimizasyonu |
+| `@core-analytics` | Metrik ve kalite özeti |
+| `@core-excel` | Excel etki matrisi |
+| `@core-pptx` | Yönetim sunumu |
+| `@core-help` | Durum analizi ve yönlendirme |
+| `@core-update` | Framework güncelle |
+| `@rk-scan` | Repo tara → knowledge-base |
+| `@rk-map` | Ekosistem haritası üret |
+| `@rk-advise` | Geliştirici sorusu yanıtla |
 
 ---
 
