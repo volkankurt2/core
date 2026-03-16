@@ -15,12 +15,7 @@ Ardından Claude Code veya Copilot Chat'ten kurulum sihirbazını başlatın:
 /core-setup
 ```
 
-`/core-setup` şunları yapar:
-- Jira / Confluence bağlantısını yapılandırır
-- Domain konfigürasyonu oluşturur
-- Analist profili oluşturur
-- Kalite eşiklerini ayarlar
-- MCP kurulum talimatlarını platform'a göre gösterir
+`/core-setup` her şeyi `~/.core/` altına yazar — proje klasörüne dokunmaz.
 
 ---
 
@@ -28,8 +23,9 @@ Ardından Claude Code veya Copilot Chat'ten kurulum sihirbazını başlatın:
 
 ### 1. MCP Bağlantısı (Zorunlu)
 
-Dosya: `~/Library/Application Support/Claude/claude_desktop_config.json`
+Platform'a göre MCP yapılandırması `/core-setup` tarafından gösterilir. Manuel kurulum:
 
+**Claude Desktop** — `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
@@ -46,48 +42,58 @@ Dosya: `~/Library/Application Support/Claude/claude_desktop_config.json`
 }
 ```
 
+**VS Code / Copilot** — proje kökünde `.vscode/mcp.json`:
+```json
+{
+  "servers": {
+    "atlassian-rovo": {
+      "url": "https://mcp.atlassian.com/v1/mcp",
+      "type": "http"
+    }
+  }
+}
+```
+
 API token: https://id.atlassian.com/manage-profile/security/api-tokens
 
-- [ ] ATLASSIAN_URL dolduruldu
-- [ ] ATLASSIAN_USERNAME dolduruldu
-- [ ] ATLASSIAN_API_TOKEN oluşturuldu ve eklendi
+- [ ] MCP yapılandırıldı
 - [ ] Test: "Jira'daki son 3 ticket'ı listele" çalışıyor
 
 ---
 
 ### 2. Sistem Konfigürasyonu (Zorunlu)
 
-`config/system.yaml` dosyasını düzenleyin:
+`/core-setup` ile otomatik oluşturulur: `~/.core/config/system.yaml`
+
+Manuel düzenleme gerekirse:
 
 ```yaml
-output_language: tr    # tr veya en
+output_language: tr           # tr veya en
 hallucination_threshold: 0.85
 prd_max_review_iterations: 2
 min_quality_score: 3.0
-chain_mode: auto_handoff
 
 integrations:
-  dry_run: false        # true → Jira/Confluence'e hiçbir şey yazılmaz
+  dry_run: false              # true → Jira/Confluence'e hiçbir şey yazılmaz
   jira:
     enabled: true
   confluence:
     enabled: true
 ```
 
-- [ ] Dil ayarlandı
-- [ ] Entegrasyon ayarları kontrol edildi
+- [ ] Dil ve entegrasyon ayarları kontrol edildi
 
 ---
 
 ### 3. Domain Kurulumu (Zorunlu)
 
-```bash
-# Şablondan yeni domain oluştur
-mkdir -p domains/[domain-id]
-cp .core/domains/_template/domain-context.yaml domains/[domain-id]/domain-context.yaml
+`/core-setup` ile otomatik oluşturulur: `~/.core/domains/[domain]/domain-context.yaml`
 
-# Aktif domain'i ayarla — config/system.yaml:
-active_domain: [domain-id]
+Manuel oluşturmak için şablonu kullanın:
+
+```bash
+mkdir -p ~/.core/domains/[domain-id]
+cp .core/domains/_template/domain-context.yaml ~/.core/domains/[domain-id]/domain-context.yaml
 ```
 
 `domain-context.yaml` içinde doldurulması gereken alanlar:
@@ -118,11 +124,12 @@ services:
 
 ```yaml
 regulations:
-  - id: [REGULASYON_ID]         # Örn: GDPR, HIPAA, KVKK, sektörünüze özgü
-    scope: [Hangi işlemler kapsanıyor]
-    risk_if_missed: [Uyumsuzlukta ne olur]
+  - id: KVKK
+    scope: Kişisel veri işleyen tüm işlemler
+    risk_if_missed: Düzenleyici para cezası
     analyst_checklist:
-      - '[Kontrol edilmesi gereken soru]'
+      - 'Veri minimizasyonu sağlandı mı?'
+      - 'Açık rıza alındı mı?'
 ```
 
 #### Opsiyonel Alanlar
@@ -131,31 +138,15 @@ regulations:
 - `test_scenario_templates` — zorunlu test senaryosu şablonları
 - `glossary` — domain terimleri sözlüğü
 
-Şablon dosyasına bakın: `.core/domains/_template/domain-context.yaml`
+Şablon: `.core/domains/_template/domain-context.yaml`
 
-- [ ] system.yaml güncellendi
 - [ ] domain-context.yaml dolduruldu (jira_project, confluence_space, services, regulations)
 
 ---
 
-### 4. Jira Proje Anahtarları (Zorunlu)
+### 4. Servis Knowledge Base'leri (Önemli)
 
-`domains/[domain]/domain-context.yaml` içinde:
-
-```yaml
-jira_project: PAY        # Jira proje kodu
-confluence_space: PAY    # Confluence space kodu
-```
-
-- [ ] Jira project key dolduruldu
-- [ ] Confluence space key dolduruldu
-
----
-
-### 5. Servis Knowledge Base'leri (Önemli)
-
-Codebase Analyst agent, etki analizi için `knowledge-base/*.json` dosyalarına ihtiyaç duyar.
-Her servis için Repo Scanner'ı çalıştırın:
+Codebase Analyst, etki analizi için `~/.core/knowledge-base/*.json` dosyalarına ihtiyaç duyar.
 
 ```
 /rk-scan https://github.com/[org]/[servis-repo]
@@ -172,46 +163,48 @@ Tüm servisleri taradıktan sonra cross-repo haritayı üretin:
 
 ---
 
-### 6. Analist Profili (Tavsiye)
+### 5. Analist Profili (Tavsiye)
+
+`/core-setup` ile otomatik oluşturulur: `~/.core/memory/personal/[isim].md`
+
+Manuel oluşturmak için:
 
 ```bash
-cp memory/personal/template.md memory/personal/[isim].md
+cp memory/personal/template.md ~/.core/memory/personal/[isim].md
 ```
 
-Dosyada `analyst_id`, `role` ve `domain` alanlarını doldurun.
-
-- [ ] Kişisel hafıza dosyası oluşturuldu
+- [ ] Analist profili oluşturuldu
 
 ---
 
-### 7. Confluence BRD Arşivi (Tavsiye)
+### 6. Confluence BRD Arşivi (Tavsiye)
 
 `.core/agents/jira-creator.agent.md` → Adım 5 → `parentId` alanını bulun.
 Confluence'tan BRD Arşivi sayfasının ID'sini alıp yazın.
 _(Confluence → Sayfa → ... → Sayfa Bilgileri → URL'de `pageId=XXXXX`)_
 
-- [ ] Confluence BRD Arşivi page ID güncellendi: ___________
+- [ ] Confluence BRD Arşivi page ID güncellendi
 
 ---
 
-### 8. Kurumsal Kararlar (Opsiyonel)
+### 7. Kurumsal Kararlar (Opsiyonel)
 
-`memory/decisions/institutional-memory.md` — Ekibinizin bilinen mimari kararlarını,
+`~/.core/memory/decisions/institutional-memory.md` — Ekibinizin bilinen mimari kararlarını,
 düzenleme yorumlarını ve standartlarını ekleyin. CORE her analizde bunları bağlam olarak kullanır.
 
 - [ ] Bilinen kurumsal kararlar eklendi
 
 ---
 
-### 9. Domain Customize Overlay (Opsiyonel)
+### 8. Domain Customize Overlay (Opsiyonel)
 
-`.core/agents/` dosyalarını doğrudan düzenlemek yerine, şirkete özgü kuralları **overlay** katmanına yazın.
-Bu sayede `git pull` ile CORE güncellemesi yapabilirsiniz — `.core/` değişiminden customize katmanınız etkilenmez.
+`.core/agents/` dosyalarını doğrudan düzenlemek yerine, şirkete özgü kuralları overlay katmanına yazın.
+Bu sayede `git pull` ile CORE güncellemesi yapabilirsiniz.
 
 ```bash
-mkdir -p domains/[domain-id]/customize
+mkdir -p ~/.core/domains/[domain-id]/customize
 cp .core/domains/_template/customize/_example.customize.yaml \
-   domains/[domain-id]/customize/prd.customize.yaml
+   ~/.core/domains/[domain-id]/customize/prd.customize.yaml
 ```
 
 Overlay dosyası yapısı:
@@ -230,16 +223,13 @@ memories:
   - "Prod deploy'lar Salı-Perşembe 10:00-16:00 arası"
 ```
 
-Her agent kendi overlay dosyasını `<activation>` adımında okur; dosya yoksa atlar.
-Desteklenen agent'lar: `interview`, `prd`, `prd-reviewer`, `codebase-analyst`, `implementation-plan`
-
 ---
 
 ## Minimum Başlangıç
 
 Yalnızca bunları yaparsanız sistem çalışır:
 1. MCP bağlantısı (Madde 1)
-2. Domain kurulumu (Madde 3) + Jira anahtarları (Madde 4)
+2. `/core-setup` → domain ve Jira anahtarları
 3. `/core-analyze [ticket-no]`
 
 ---
@@ -247,16 +237,10 @@ Yalnızca bunları yaparsanız sistem çalışır:
 ## Yeni Domain Ekleme
 
 ```bash
-mkdir -p domains/[domain-id]
-cp .core/domains/_template/domain-context.yaml domains/[domain-id]/domain-context.yaml
+mkdir -p ~/.core/domains/[domain-id]
+cp .core/domains/_template/domain-context.yaml ~/.core/domains/[domain-id]/domain-context.yaml
 # domain-context.yaml'ı düzenle
-# config/system.yaml → active_domain: [domain-id]
-```
-
-Kurulumu doğrulamak için bir test analizi çalıştırın:
-
-```
-/core-analyze [test-ticket-id]
+# ~/.core/config/system.yaml → active_domain: [domain-id]
 ```
 
 Kontrol listesi:
@@ -267,78 +251,54 @@ Kontrol listesi:
 
 ---
 
-## Dashboard
-
-```bash
-cd dashboard
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Tarayıcı: `http://localhost:8501`
-
----
-
-## İlk Analiz
-
-```
-/core-analyze [JIRA-TICKET-NO]
-```
-
----
-
 ## Dizin Yapısı
 
+**Repo (git):**
 ```
 CORE/
-├── .core/                   # Tek kaynak — agent/skill/prompt dosyaları
-│   ├── agents/              # Agent zinciri (.agent.md)
-│   ├── skills/              # Yardımcı skill'ler
-│   ├── prompts/             # Analiz giriş noktaları
-│   └── domains/_template/   # Domain şablonu + customize overlay örneği
-├── .claude/commands/        # Claude Code slash komutları (git'te doğrudan)
+├── .core/                   ← agent/skill/prompt — tek kaynak
+│   ├── agents/
+│   ├── skills/
+│   ├── prompts/
+│   └── domains/_template/   ← domain şablonu
+├── .claude/commands/        ← Claude Code slash komutları
 ├── .github/
-│   ├── copilot-instructions.md  # Copilot sistem talimatları
-│   └── prompts/             # Copilot #komut dosyaları (git'te doğrudan)
-├── domains/
-│   └── [domain-id]/         # Aktif domain pack'ler (gitignored)
-│       ├── domain-context.yaml
-│       └── customize/       # Agent üzerine yazma katmanı (opsiyonel)
-├── knowledge-base/          # Servis KB'leri — repo-scanner ile üretilir (gitignored)
-├── memory/                  # Kurumsal hafıza (kısmen gitignored)
-│   ├── decisions/
-│   ├── personal/
-│   ├── feedback/
-│   └── tbd-tracker/
-├── config/
-│   └── system.yaml          # Sistem konfigürasyonu (gitignored)
-└── core-output/             # Analiz çıktıları (otomatik oluşur, gitignored)
+│   ├── agents/              ← Copilot @agent dosyaları
+│   └── copilot-instructions.md
+└── memory/*/template.md     ← boş şablonlar (referans)
 ```
 
-> **Tek Kaynak:** `.core/agents/` ve `.core/skills/` git'te versiyonlanır.
-> Platform komutları doğrudan `.claude/commands/` ve `.github/prompts/` altındadır.
+**Kullanıcı verisi (`~/.core/`):**
+```
+~/.core/
+├── config/system.yaml
+├── domains/[domain-id]/
+│   ├── domain-context.yaml
+│   └── customize/           ← agent overlay (opsiyonel)
+├── memory/
+│   ├── decisions/institutional-memory.md
+│   ├── tbd-tracker/tbd-tracker.md
+│   ├── feedback/feedback-log.md
+│   └── personal/[analist].md
+├── core-output/[TICKET]/    ← analiz çıktıları
+└── knowledge-base/          ← repo-scanner çıktısı
+```
 
 ---
 
 ## Sık Sorulan Sorular
 
 **Birden fazla domain destekliyor musunuz?**
-Evet. `domains/` altına istediğiniz kadar domain ekleyebilirsiniz. `config/system.yaml` içindeki `active` değerini değiştirerek geçiş yapın.
-
-**Aynı anda birden fazla domain kullanabilir miyim?**
-Hayır. Tek bir `active` domain tanımlanır. Farklı projeler için `active` alanını güncelleyin.
+Evet. `~/.core/domains/` altına istediğiniz kadar domain ekleyebilirsiniz. `~/.core/config/system.yaml` içindeki `active_domain` değerini değiştirerek geçiş yapın.
 
 **Türkçe dışında dil kullanabilir miyim?**
-Evet. `config/system.yaml` içinde `output_language: en` yapın.
+Evet. `~/.core/config/system.yaml` içinde `output_language: en` yapın.
 
 **Jira olmadan kullanabilir miyim?**
-Evet, kısmi olarak. `integrations.jira.enabled: false` yapın. Jira Creator agent çalışmaz ama diğer 6 agent sorunsuz çalışır.
+Evet, kısmi olarak. `integrations.jira.enabled: false` yapın. Jira Creator agent çalışmaz ama diğer agent'lar sorunsuz çalışır.
 
 **Sadece doküman üretmek, Atlassian'a yazmak istemiyorum.**
-`config/system.yaml` içinde `integrations.dry_run: true` yapın.
+`~/.core/config/system.yaml` içinde `integrations.dry_run: true` yapın veya analiz sırasında `--dry-run` argümanı kullanın.
 
-**Dashboard neye ihtiyaç duyuyor?**
-`core-output/[TICKET]/metrics.json` dosyaları ve `memory/` altındaki markdown dosyaları. İlk analizden önce dashboard boş görünür.
-
-**domain-context.yaml'da olmayan bir alan ekleyebilir miyim?**
-Evet. YAML genişletilebilirdir. Ekstra alanlar görmezden gelinir; kullanmak istiyorsanız ilgili agent dosyasına okuma notu ekleyin.
+**`git pull` yaptım, verilerim kaybolur mu?**
+Hayır. Tüm kullanıcı verisi `~/.core/` altındadır — git repo'suyla ilgisi yoktur.

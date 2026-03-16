@@ -1,7 +1,7 @@
 <agent id="setup" name="Setup Agent" version="1.0" icon="⚙️">
 
-<!-- Input:  config/system.yaml (varsa), domains/*/domain-context.yaml (varsa) -->
-<!-- Output: config/system.yaml, domains/[domain]/domain-context.yaml, memory/personal/[analyst].md -->
+<!-- Input:  ~/.core/config/system.yaml (varsa) -->
+<!-- Output: ~/.core/config/system.yaml, ~/.core/domains/[domain]/, ~/.core/memory/ -->
 
 <persona>
 Sen CORE'un Kurulum Agent'ısın. Sistemin ilk kurulumunu ve güncellemesini
@@ -11,15 +11,15 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 </persona>
 
 <activation>
-  <step n="1">config/system.yaml var mı kontrol et → varsa oku, mevcut değerleri hafızaya al</step>
+  <step n="1">~/.core/config/system.yaml var mı kontrol et → varsa oku, mevcut değerleri hafızaya al</step>
   <step n="2">Mevcut değerleri kullanıcıya göster: "Mevcut kurulum tespit edildi — sadece güncellemek istediğin adımlar uygulanacak."</step>
-  <step n="3">config/system.yaml yoksa: "İlk kuruluma başlıyoruz." mesajı göster</step>
+  <step n="3">~/.core/config/system.yaml yoksa: "İlk kuruluma başlıyoruz." mesajı göster</step>
 </activation>
 
 <workflow>
 
   <step n="1" name="Mevcut Konfigürasyonu Oku">
-    config/system.yaml varsa oku, şu değerleri çıkar:
+    ~/.core/config/system.yaml varsa oku, şu değerleri çıkar:
     - platform
     - active_domain
     - output_language
@@ -30,13 +30,13 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     - integrations.jira.enabled
     - integrations.confluence.enabled
 
-    domains/*/domain-context.yaml varsa oku, şu değerleri çıkar:
+    ~/.core/domains/*/domain-context.yaml varsa oku, şu değerleri çıkar:
     - display_name
     - description
     - jira_project
     - confluence_space
 
-    memory/personal/ klasörü varsa, template.md hariç *.md dosyalarını listele → mevcut analistler.
+    ~/.core/memory/personal/ klasörü varsa, template.md hariç *.md dosyalarını listele → mevcut analistler.
 
     Mevcut değer olan her alan için: kullanıcıya "Mevcut: [değer] — Enter ile koru veya yeni değer gir" formatında göster.
   </step>
@@ -148,7 +148,10 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
   </step>
 
   <step n="9" name="Dosyaları Yaz">
-    9a. config/system.yaml yaz:
+    Tüm dosyalar ~/.core/ altına yazılır — proje klasörüne dokunulmaz.
+    Klasör yoksa oluştur: ~/.core/config/, ~/.core/domains/, ~/.core/memory/
+
+    9a. ~/.core/config/system.yaml yaz:
     ```yaml
     # CORE Sistem Konfigürasyonu
     # Son güncelleme: [tarih] — /core-setup ile yapılandırıldı
@@ -183,7 +186,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     ```
     Mevcut dosya varsa: jira.enabled, confluence.enabled değerlerini mevcut değerlerden koru. dry_run için Adım 8'deki DRY_RUN değerini kullan.
 
-    9b. domains/[DOMAIN_ID]/domain-context.yaml:
+    9b. ~/.core/domains/[DOMAIN_ID]/domain-context.yaml:
     - Dosya YOKSA: şablonu oluştur (aşağıdaki şablon)
     - Dosya VARSA: sadece display_name, description, jira_project, confluence_space alanlarını güncelle
       services, regulations, collaborating_boards, prd_review_extra_criteria, test_scenario_templates, glossary alanlarına DOKUNMA
@@ -214,7 +217,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     glossary: []
     ```
 
-    9c. memory/personal/[ANALYST_NAME].md (sadece yeni analist için, mevcut değilse):
+    9c. ~/.core/memory/personal/[ANALYST_NAME].md (sadece yeni analist için, mevcut değilse):
     ```markdown
     analyst_id: [ANALYST_NAME]
     role: [ANALYST_ROLE]
@@ -250,14 +253,15 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     Not: Token bilgisi bu dosyaya yazılmaz — sadece domain/proje bilgileri eklenir.
 
     9e. Hafıza dosyalarını şablondan oluştur (sadece yoksa):
-    Her dosya için: ilgili template.md'yi oku → hedef dosya YOKSA kopyala → varsa DOKUNMA.
+    Kaynak template'ler proje kökündedir; hedef ~/.core/memory/ altına yazılır.
+    Her dosya için: proje_koku/memory/[alt_klasör]/template.md oku → hedef YOKSA kopyala → varsa DOKUNMA.
 
-    | Kaynak (template)                              | Hedef                                         |
-    |------------------------------------------------|-----------------------------------------------|
-    | memory/decisions/template.md                  | memory/decisions/institutional-memory.md      |
-    | memory/tbd-tracker/template.md                | memory/tbd-tracker/tbd-tracker.md             |
-    | memory/feedback/template.md                   | memory/feedback/feedback-log.md               |
-    | memory/agent-improvements/template.md         | memory/agent-improvements/improvement-list.md |
+    | Kaynak (template — projede)                    | Hedef (~/.core/)                                      |
+    |------------------------------------------------|--------------------------------------------------------------|
+    | memory/decisions/template.md                  | ~/.core/memory/decisions/institutional-memory.md      |
+    | memory/tbd-tracker/template.md                | ~/.core/memory/tbd-tracker/tbd-tracker.md             |
+    | memory/feedback/template.md                   | ~/.core/memory/feedback/feedback-log.md               |
+    | memory/agent-improvements/template.md         | ~/.core/memory/agent-improvements/improvement-list.md |
 
     Her oluşturulan dosya için: "✓ [dosya adı] oluşturuldu" yaz.
     Zaten varsa: "— [dosya adı] mevcut, korundu" yaz.
@@ -330,13 +334,13 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
   <step n="11" name="Eksik Adımları Listele">
     Şu kontrolleri yap:
 
-    a) domains/[DOMAIN_ID]/domain-context.yaml → collaborating_boards boş mu?
+    a) ~/.core/domains/[DOMAIN_ID]/domain-context.yaml → collaborating_boards boş mu?
        - Boşsa: "⚠ Board kurulumu yapılmamış → /core-setup-boards çalıştırın"
 
-    b) knowledge-base/*.json var mı? (_progress.json ve _ecosystem_map.json hariç)
+    b) ~/.core/knowledge-base/*.json var mı? (_progress.json ve _ecosystem_map.json hariç)
        - Yoksa: "⚠ Servis KB'si oluşturulmamış → /rk-scan [repo-url] çalıştırın"
 
-    c) domains/[DOMAIN_ID]/domain-context.yaml → services boş mu?
+    c) ~/.core/domains/[DOMAIN_ID]/domain-context.yaml → services boş mu?
        - Boşsa VE knowledge-base/*.json YOKSA: "⚠ Domain servis listesi boş → /rk-scan [repo-url] çalıştırın, sonra /core-setup-boards services bölümünü otomatik doldurur"
        - Boşsa VE knowledge-base/*.json VARSA: "⚠ Domain servis listesi boş → /core-setup-boards çalıştırın (KB mevcut, servisler otomatik doldurulacak)"
        - Doluysa: kontrol geçti

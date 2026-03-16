@@ -7,7 +7,7 @@
 ## Nedir?
 
 CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz eden,
-13 AI agent'tan oluşan otonom bir sistemdir. Her agent bir öncekinin çıktısını girdi olarak alır.
+19 AI agent'tan oluşan otonom bir sistemdir. Her agent bir öncekinin çıktısını girdi olarak alır.
 
 **İki katmandan oluşur:**
 
@@ -22,8 +22,8 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 - Yönetim sunumu (PPTX) ve etki matrisi (Excel)
 
 **2. Repo Knowledge (RK)** — codebase'i tarayarak servis KB'si oluşturur:
-- Her servis için `knowledge-base/[servis].json` — API'ler, bağımlılıklar, güvenlik riskleri, test durumu
-- Cross-repo bağımlılık ve etki haritası (`knowledge-base/_ecosystem_map.json`)
+- Her servis için `~/.core/knowledge-base/[servis].json` — API'ler, bağımlılıklar, güvenlik riskleri
+- Cross-repo bağımlılık ve etki haritası (`_ecosystem_map.json`)
 - Geliştirici soruları için anlık yönlendirme
 
 ---
@@ -43,7 +43,7 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
    ONAY ↓   ↑ RED (maks 2 iterasyon)
         ↓ ✋ Handoff Onayı
   Codebase Analyst       → 04-impact-analysis.md
-  [knowledge-base/*.json kaynak olarak kullanır]
+  [~/.core/knowledge-base/*.json kaynak olarak kullanır]
         ↓ ✋ Handoff Onayı
   Implementation Planner → 05-user-stories.md + 06-test-scenarios.md + 07-implementation-plan.md
         ↓ ✋ Handoff Onayı (Atlassian yazma öncesi kritik)
@@ -52,16 +52,6 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
   Feedback Collector     → Analist puanlaması + kurumsal hafıza güncelleme
 ```
 
-| # | Agent | Çıktı |
-|---|-------|-------|
-| 1 | **Interview Agent** | `00-requirements-brief.md` |
-| 2 | **PRD Agent** | `01-prd.md` + `02-brd.md` |
-| 3 | **PRD Reviewer** | `03-review-report.md` (ONAY / RED) |
-| 4 | **Codebase Analyst** | `04-impact-analysis.md` |
-| 5 | **Implementation Planner** | `05-user-stories.md` + `06-test-scenarios.md` + `07-implementation-plan.md` |
-| 6 | **Jira Creator** | Jira ticket'ları + Confluence sayfası |
-| 7 | **Feedback Collector** | `memory/` güncellenir |
-
 ---
 
 ## Agent Zinciri (Repo Knowledge)
@@ -69,37 +59,20 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 ```
 /rk-scan [repo-url]
         ↓
-  Repo Scanner     → knowledge-base/[servis].json
-  (tekrar çağrılır her yeni servis için)
+  Repo Scanner     → ~/.core/knowledge-base/[servis].json
         ↓
 /rk-map
         ↓
-  Ecosystem Mapper → knowledge-base/_ecosystem_map.json
+  Ecosystem Mapper → ~/.core/knowledge-base/_ecosystem_map.json
         ↓
 /rk-advise [görev]
         ↓
   Dev Advisor      → 8 başlıklı geliştirici rehberi
 ```
 
-| # | Agent | Çıktı |
-|---|-------|-------|
-| 1 | **Orchestrator** | Tüm analiz zincirini uçtan uca yönetir |
-| 2 | **Interview Agent** | `00-requirements-brief.md` |
-| 3 | **PRD Agent** | `01-prd.md` + `02-brd.md` |
-| 4 | **PRD Reviewer** | `03-review-report.md` |
-| 5 | **Codebase Analyst** | `04-impact-analysis.md` |
-| 6 | **Implementation Planner** | `05-user-stories.md` + `06-test-scenarios.md` + `07-implementation-plan.md` |
-| 7 | **Jira Creator** | Jira ticket'ları + Confluence sayfası |
-| 8 | **Feedback Collector** | `memory/` güncellenir |
-| 9 | **Setup Agent** | `config/system.yaml`, `domains/*/domain-context.yaml` |
-| 10 | **Prompt Optimizer** | `.core/agents/*.agent.md` — agent kalitesini iyileştirme |
-| 11 | **Repo Scanner** | `knowledge-base/[servis].json` — servis tüm detaylarıyla |
-| 12 | **Ecosystem Mapper** | `knowledge-base/_ecosystem_map.json` — cross-repo harita |
-| 13 | **Dev Advisor** | Anlık geliştirici yönlendirmesi |
-
 ---
 
-## Kurulum — Claude (Claude Code CLI / Desktop)
+## Kurulum
 
 ### Adım 1 — Repo'yu Klonla
 
@@ -110,7 +83,7 @@ cd CORE
 
 ### Adım 2 — /core-setup Çalıştır
 
-Claude Code'u başlatın ve kurulum sihirbazını çalıştırın:
+Claude Code veya Copilot Chat'ten kurulum sihirbazını başlatın:
 
 ```
 /core-setup
@@ -120,28 +93,21 @@ Sihirbaz şunları sorar:
 - **Platform:** Claude Code CLI / Claude Desktop / VS Code / GitHub Copilot
 - Jira / Confluence URL ve API token
 - Aktif domain (ör. `payment`)
-- Analist adı
-- Kalite eşikleri
+- Analist adı ve kalite eşikleri
 
-Sihirbaz biter bitmez:
-- `config/system.yaml` oluşturulur
-- `domains/[domain]/domain-context.yaml` oluşturulur
-- `.claude/commands/` altına tüm slash komutları kopyalanır
-- MCP kurulum talimatları (platform'a göre exact komut/JSON) gösterilir
+Sihirbaz biter bitmez tüm kullanıcı verisi `~/.core/` altına yazılır:
+- `~/.core/config/system.yaml`
+- `~/.core/domains/[domain]/domain-context.yaml`
+- `~/.core/memory/` altındaki hafıza dosyaları
+- MCP kurulum talimatları (platform'a göre exact komut/JSON) ekrana gösterilir
 
 ### Adım 3 — Servis KB'lerini Oluştur
-
-Codebase Analyst, etki analizi için `knowledge-base/*.json` dosyalarına ihtiyaç duyar.
-Her servis için Repo Scanner'ı çalıştır:
 
 ```
 /rk-scan https://github.com/[org]/[servis-repo]
 ```
 
-Scanner tamamlandığında `knowledge-base/[servis].json` oluşturulur.
-`domain-context.yaml`'daki `kb:` alanı otomatik olarak bu dosyaya işaret eder.
-
-Tüm servisleri taradıktan sonra cross-repo haritayı üret:
+Tüm servisleri taradıktan sonra:
 
 ```
 /rk-map
@@ -155,140 +121,57 @@ Tüm servisleri taradıktan sonra cross-repo haritayı üret:
 
 ---
 
-## Kurulum — GitHub Copilot
-
-### Ön Koşul: VS Code + MCP
-
-1. VS Code'a **GitHub Copilot** extension kur
-2. VS Code'a **Atlassian MCP** extension kur veya `/core-setup` ile yapılandır
-
-### Adım 1 — Repo'yu Klonla
-
-```bash
-git clone https://github.com/[kullanici]/CORE.git
-cd CORE
-```
-
-### Adım 2 — /core-setup Çalıştır (Copilot Platformu)
-
-Claude Code'u başlatın:
-
-```
-/core-setup
-```
-
-Sihirbazda **Platform:** `4 → GitHub Copilot` seçin.
-
-Sihirbaz şunları otomatik oluşturur:
-- `.github/copilot-instructions.md` → Copilot'a tüm agent talimatlarını tanıtır
-- `.vscode/mcp.json` için exact JSON içeriği gösterilir (manuel oluşturmanız gerekir)
-
-### Adım 3 — Domain ve KB Yapılandır
-
-Claude kurulumundaki Adım 3 ve 4 ile aynıdır.
-
-### Adım 4 — Copilot Chat'ten Kullan
-
-VS Code'da Copilot Chat panelini aç (`Ctrl+Shift+I` / `Cmd+Shift+I`):
-
-```
-@workspace /core-analyze PAY-1234
-```
-
-veya doğrudan:
-
-```
-CORE sistemi ile PAY-1234 ticket'ını analiz et
-```
-
-> Copilot, `.github/copilot-instructions.md` sayesinde tüm agent zincirini otomatik çalıştırır.
-
----
-
 ## Komutlar
 
-Komutlar platforma göre farklı mekanizma kullanır — içerik aynı, format farklı:
-
-| Claude Code (slash) | Copilot (prompt) | Açıklama |
-|---------------------|------------------|----------|
-| `/core-analyze [ticket]` | `#core-analyze` | Standart analiz zinciri |
-| `/core-epic-analyze [ticket]` | `#core-epic-analyze` | Epic ölçekli analiz |
-| `/core-memory [konu]` | `#core-memory` | Kurumsal hafıza sorgusu |
-| `/core-tbd` | — | Açık TBD'leri listele |
-| `/core-pptx [ticket]` | — | Yönetim sunumu (PPTX) |
-| `/core-excel [ticket]` | — | Teknik etki matrisi (Excel) |
-| `/core-optimize [agent?]` | — | Agent prompt'larını optimize et |
-| `/core-analytics [N\|ticket]` | — | Performans metrikleri |
-| `/core-help` | `#core-help` | Mevcut durumu analiz et, sonraki adımı öner |
-| `/core-setup` | `#core-setup` | Kurulum sihirbazı |
-| `/core-setup-boards` | `#core-setup-boards` | Jira board keşfi |
-| `/core-update` | — | CORE framework'ünü güvenli güncelle |
-| `/rk-scan [repo-url]` | `#rk-scan` | Repo tara → knowledge-base |
-| `/rk-map` | `#rk-map` | Ekosistem haritası üret |
-| `/rk-advise [görev]` | `#rk-advise` | Geliştirici yönlendirmesi |
-
-> **Claude Code:** `.claude/commands/` altındaki dosyalar slash komutu olarak görünür.
-> **Copilot:** `.github/prompts/` altındaki `.prompt.md` dosyaları `#` ile çağrılır.
-
-### Örnek Kullanımlar
-
-```
-# Claude Code
-/core-analyze PROJ-1234
-/rk-scan https://github.com/[org]/[servis-repo]
-/rk-advise Ödeme limitini hangi servise, hangi katmana yazmalıyım?
-
-# Copilot Chat
-#core-analyze   → input: PROJ-1234
-#rk-scan        → input: https://github.com/[org]/[servis-repo]
-#rk-advise      → input: Ödeme limitini hangi servise yazmalıyım?
-#core-help      → mevcut analiz durumu ve komut listesi
-```
+| Claude Code | Copilot Chat | Açıklama |
+|-------------|--------------|----------|
+| `/core-analyze [ticket]` | `@core-analyze` | Standart analiz zinciri |
+| `/core-epic-analyze [ticket]` | `@core-epic-analyze` | Epic ölçekli analiz |
+| `/core-memory [konu]` | `@core-memory` | Kurumsal hafıza sorgusu |
+| `/core-tbd` | `@core-tbd` | Açık TBD'leri listele / güncelle |
+| `/core-pptx [ticket]` | `@core-pptx` | Yönetim sunumu (PPTX) |
+| `/core-excel [ticket]` | `@core-excel` | Teknik etki matrisi (Excel) |
+| `/core-optimize [agent?]` | `@core-optimize` | Agent prompt'larını optimize et |
+| `/core-analytics [N\|ticket]` | `@core-analytics` | Performans metrikleri |
+| `/core-help` | `@core-help` | Mevcut durumu analiz et |
+| `/core-setup` | `@core-setup` | Kurulum sihirbazı |
+| `/core-setup-boards` | `@core-setup-boards` | Jira board keşfi |
+| `/core-update` | `@core-update` | CORE framework'ünü güvenli güncelle |
+| `/rk-scan [repo-url]` | `@rk-scan` | Repo tara → knowledge-base |
+| `/rk-map` | `@rk-map` | Ekosistem haritası üret |
+| `/rk-advise [görev]` | `@rk-advise` | Geliştirici yönlendirmesi |
 
 ---
 
-## Knowledge Base (knowledge-base/)
+## Klasör Yapısı
 
-CORE, etki analizini gerçek codebase verisiyle besler. Manuel README yerine her servisin otomatik taranan JSON KB dosyası kullanılır.
+**Repo (git ile versiyonlanır):**
 
 ```
-knowledge-base/
-├── _progress.json          ← Hangi repolar tarandı, ne zaman?
-├── _ecosystem_map.json     ← Cross-repo bağımlılık haritası (rk-map üretir)
-├── payment.json            ← Payment Service KB
-├── okc.json                ← OKC Service KB
-├── payment-handler.json    ← Payment Handler KB
-├── mobile.json             ← Mobile Backend KB
-└── ...                     ← Diğer servisler
+CORE/
+├── .core/
+│   ├── agents/          ← 19 agent (.agent.md) — tek kaynak
+│   ├── skills/          ← 10 skill (SKILL.md)
+│   └── prompts/         ← analiz giriş noktaları
+├── .claude/
+│   └── commands/        ← Claude Code slash komutları
+├── .github/
+│   ├── agents/          ← Copilot @agent dosyaları
+│   └── copilot-instructions.md
+└── memory/
+    └── */template.md    ← boş şablonlar (referans)
 ```
 
-Her `knowledge-base/[servis].json` dosyası şunları içerir:
-- API endpoint kataloğu (controller + metod düzeyinde)
-- Servis bağımlılık grafiği
-- DTO şemaları ve enum kataloğu
-- Güvenlik haritası ve riskleri
-- Test durumu ve kapsanmayan kritik sınıflar
-- Teknik borç ve performans riskleri
-- Migration durumu
+**Kullanıcı verisi (`~/.core/` — git dışı, tüm platformlarda ortak):**
 
-**KB ne zaman güncellenir?** Repo'da önemli bir değişiklik olduğunda `/rk-scan` yeniden çalıştırılır. `_progress.json` hangi servislerin güncel olduğunu gösterir.
-
----
-
-## Yeni Domain Ekle
-
-```bash
-mkdir -p domains/[domain-id]
-cp .core/domains/_template/domain-context.yaml domains/[domain-id]/domain-context.yaml
-# domain-context.yaml'ı düzenle (domain, jira_project, services, regulations)
-# services altında her servis için:
-#   kb: knowledge-base/[servis-id].json   ← repo-scanner ile oluşturulan dosya
-
-# Aktif yap:
-# config/system.yaml → active_domain: [domain-id]
 ```
-
-> Adım adım kılavuz: `SETUP.md`
+~/.core/
+├── config/system.yaml          ← sistem konfigürasyonu
+├── domains/[domain-id]/        ← domain pack (/core-setup ile oluşturulur)
+├── memory/                     ← kurumsal hafıza (kararlar, TBD, feedback)
+├── core-output/                ← analiz çıktıları
+└── knowledge-base/             ← servis knowledge base (repo-scanner çıktısı)
+```
 
 ---
 
@@ -296,27 +179,20 @@ cp .core/domains/_template/domain-context.yaml domains/[domain-id]/domain-contex
 
 CORE, analiz süreçlerinde kurumsal bilgiyi üç katmanda yönetir:
 
-### Kalıcı Kararlar (`memory/decisions/institutional-memory.md`)
+### Kalıcı Kararlar (`~/.core/memory/decisions/institutional-memory.md`)
 
-Tüm analizlerde geçerli mimari ve iş kararları (KUR-NNN formatı):
-
-| Karar | Başlık |
-|-------|--------|
-| KUR-001 | *(Örnek)* API Versiyon Politikası — yeni entegrasyonlarda v2 zorunlu |
-| KUR-NNN | Kendi kurumsal kararlarınız otomatik eklenir |
-
-Yeni analiz başlarken CORE bu kararları otomatik tarar. Çelişki tespit edilirse:
+Tüm analizlerde geçerli mimari ve iş kararları (KUR-NNN formatı). Yeni analiz başlarken CORE bu kararları otomatik tarar. Çelişki tespit edilirse:
 - 🔴 **Kategori A** — Analiz durur, kullanıcı karar verir
 - 🟡 **Kategori B** — PRD'ye "Dikkat" bölümü eklenir
 - 🔵 **Kategori C** — "Geçmiş Referanslar" bölümüne eklenir
 
-### TBD Takibi (`memory/tbd-tracker/tbd-tracker.md`)
+### TBD Takibi (`~/.core/memory/tbd-tracker/tbd-tracker.md`)
 
-Analiz sırasında yanıtlanamayan sorular TBD olarak kaydedilir, Jira'da `has-open-tbd` etiketiyle işaretlenir.
+Analiz sırasında yanıtlanamayan sorular TBD olarak kaydedilir.
 
-### Kişisel Hafıza (`memory/personal/[analist].md`)
+### Kişisel Hafıza (`~/.core/memory/personal/[analist].md`)
 
-Her analistin tercih ettiği yaklaşımlar, geçmiş puanlar ve geliştirilecek alanlar.
+Her analistin tercihler, geçmiş puanlar ve geliştirilecek alanlar.
 
 ---
 
@@ -324,98 +200,32 @@ Her analistin tercih ettiği yaklaşımlar, geçmiş puanlar ve geliştirilecek 
 
 | Skill | Görev |
 |-------|-------|
-| `elicitation` | Ticket yeterlilik skoru + yapılandırılmış diyalog: 5 Whys, sessizlik kuralı, varsayım onayı |
-| `hallucination-guard` | Servis adı, API, regülasyon referanslarını `knowledge-base/*.json` ve `domain-context.yaml`'a karşı doğrular |
+| `elicitation` | Ticket yeterlilik skoru + yapılandırılmış diyalog |
+| `hallucination-guard` | Servis adı, API, regülasyon referanslarını doğrular |
 | `memory-conflict-checker` | Yeni gereksinim ile KUR kararlarını karşılaştırır |
-| `brd-quality` | BRD için kontrol listeleri ve şablonlar |
-| `output-formats` | PPTX, Excel, Jira yorumu ve Confluence sayfa formatları |
-| `integrations` | Jira ve Confluence MCP aksiyonları (okuma + yazma) |
-| `jira-smart-read` | Jira ticket'larını ve bağlı issue'ları akıllı okur |
+| `brd-quality` | BRD kontrol listeleri ve şablonlar |
+| `output-formats` | PPTX, Excel, Jira yorumu ve Confluence formatları |
+| `integrations` | Jira ve Confluence MCP aksiyonları |
+| `jira-smart-read` | Jira ticket'larını akıllı okur |
 | `performance-tracker` | Her analiz için `metrics.json` üretir |
-| `scan-java` | Repo Scanner için Java/Spring Boot derin tarama protokolü |
-| `scan-dotnet` | Repo Scanner için .NET/C# derin tarama protokolü |
+| `scan-java` | Java/Spring Boot derin tarama protokolü |
+| `scan-dotnet` | .NET/C# derin tarama protokolü |
 
 ---
 
 ## Çıktı Yapısı
 
 ```
-core-output/PAY-1234/
-├── 00-requirements-brief.md   ← Gereksinim özeti
-├── 01-prd.md                  ← GGD
-├── 02-brd.md                  ← BRD
-├── 03-review-report.md        ← ONAY / RED kararı
-├── 04-impact-analysis.md      ← Etkilenen servisler, risk, efor
-├── 05-user-stories.md         ← Gherkin AC formatında user stories
-├── 06-test-scenarios.md       ← Test senaryoları
-├── 07-implementation-plan.md  ← Sprint planı
-├── metrics.json               ← Performans ve maliyet metrikleri
-└── teknik-etki-matrisi.xlsx   ← Excel etki matrisi (opsiyonel)
-```
-
----
-
-## Klasör Yapısı
-
-```
-CORE/
-├── CLAUDE.md                              ← Her oturumda otomatik yüklenir
-├── SETUP.md                               ← Kurulum rehberi + domain kılavuzu
-│
-├── .core/                                 ← Tek kaynak — git'te versiyonlanır
-│   ├── agents/                            ← 13 agent (.agent.md)
-│   │   ├── orchestrator.agent.md          ← Zincir yöneticisi
-│   │   ├── interview.agent.md             ← Analiz zinciri
-│   │   ├── prd.agent.md
-│   │   ├── prd-reviewer.agent.md
-│   │   ├── codebase-analyst.agent.md
-│   │   ├── implementation-plan.agent.md
-│   │   ├── jira-creator.agent.md
-│   │   ├── feedback-collector.agent.md
-│   │   ├── prompt-optimizer.agent.md
-│   │   ├── setup.agent.md
-│   │   ├── repo-scanner.agent.md          ← RK zinciri
-│   │   ├── ecosystem-mapper.agent.md
-│   │   └── dev-advisor.agent.md
-│   │
-│   ├── skills/                            ← 10 skill (SKILL.md)
-│   │   ├── hallucination-guard/
-│   │   ├── memory-conflict-checker/
-│   │   ├── brd-quality/
-│   │   ├── output-formats/
-│   │   ├── integrations/
-│   │   ├── jira-smart-read/
-│   │   ├── performance-tracker/
-│   │   ├── scan-java/                     ← RK skill'leri
-│   │   └── scan-dotnet/
-│   │
-│   └── prompts/                           ← Analiz giriş noktaları
-│
-├── .claude/
-│   └── commands/                          ← Claude Code slash komutları (git'te)
-│
-├── .github/
-│   ├── copilot-instructions.md            ← Copilot sistem talimatları
-│   └── prompts/                           ← Copilot prompt dosyaları (slash komut eşdeğeri)
-│
-├── domains/
-│   └── [domain-id]/domain-context.yaml   ← Aktif domain pack (gitignored)
-│
-├── knowledge-base/                                    ← Servis knowledge base (gitignored)
-│   ├── _progress.json                     ← Tarama durumu
-│   ├── _ecosystem_map.json                ← Cross-repo harita
-│   └── [servis].json                      ← repo-scanner ile üretilir
-│
-├── memory/                                ← Kurumsal hafıza (kısmen gitignored)
-│   ├── decisions/institutional-memory.md
-│   ├── tbd-tracker/tbd-tracker.md
-│   ├── feedback/feedback-log.md
-│   └── personal/
-│
-├── config/
-│   └── system.yaml                        ← Tüm konfigürasyon
-│
-└── core-output/                           ← Analiz çıktıları (gitignored)
+~/.core/core-output/PAY-1234/
+├── 00-requirements-brief.md
+├── 01-prd.md
+├── 02-brd.md
+├── 03-review-report.md
+├── 04-impact-analysis.md
+├── 05-user-stories.md
+├── 06-test-scenarios.md
+├── 07-implementation-plan.md
+└── metrics.json
 ```
 
 ---
@@ -424,12 +234,9 @@ CORE/
 
 | Dosya | Amaç |
 |-------|------|
-| `CLAUDE.md` | Agent zinciri ve proje kuralları — her oturumda yüklenir |
-| `SETUP.md` | Kurulum rehberi, kontrol listesi, domain kılavuzu |
-| `config/system.yaml` | Dil, platform, domain, entegrasyon, kalite eşikleri |
-| `domains/[domain]/domain-context.yaml` | Servisler (`kb:` alanı), regülasyonlar, board'lar |
-| `knowledge-base/_progress.json` | Hangi servisler tarandı ve güncel mi? |
-| `knowledge-base/_ecosystem_map.json` | Cross-repo bağımlılık ve etki haritası |
-| `memory/decisions/institutional-memory.md` | Kurumsal kararlar (KUR-NNN) |
-| `memory/tbd-tracker/tbd-tracker.md` | Açık belirsizlikler |
-| `memory/personal/template.md` | Analist hafıza şablonu |
+| `SETUP.md` | Kurulum rehberi ve kontrol listesi |
+| `~/.core/config/system.yaml` | Dil, platform, domain, kalite eşikleri |
+| `~/.core/domains/[domain]/domain-context.yaml` | Servisler, regülasyonlar, board'lar |
+| `~/.core/knowledge-base/_progress.json` | Hangi servisler tarandı? |
+| `~/.core/memory/decisions/institutional-memory.md` | Kurumsal kararlar (KUR-NNN) |
+| `~/.core/memory/tbd-tracker/tbd-tracker.md` | Açık belirsizlikler |
