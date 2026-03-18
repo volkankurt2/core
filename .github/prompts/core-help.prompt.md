@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Sistem durumu analizi ve hangi komutu kullanman gerektiği hakkında yönlendirme'
 ---
 

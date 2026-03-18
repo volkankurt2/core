@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Birlikte çalışılan Jira board\'larını keşfet ve config\'e kaydet'
 ---
 

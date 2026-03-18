@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal', 'fetch']
+agent: 'agent'
+tools: ['search/codebase', 'fetch']
 description: 'CORE — Repo tara: mimari, bağımlılıklar ve kod kalitesi analizi'
 ---
 

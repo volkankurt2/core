@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Kurulum sihirbazı: CORE framework\'ü bu repo için ilk kez yapılandır'
 ---
 

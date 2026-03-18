@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Açık TBD\'leri listele veya belirli bir TBD\'yi güncelle'
 ---
 

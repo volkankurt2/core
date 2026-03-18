@@ -39,6 +39,10 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
 <workflow>
 
+  <!-- ZORUNLU DAVRANIŞ: Her adımda YALNIZCA O ADIMIN sorusunu sor.
+       Kullanıcı cevap vermeden bir sonraki adıma ASLA geçme.
+       Tüm soruları birden listeleme — birer birer, sırayla ilerle. -->
+
   <step n="1" name="Mevcut Konfigürasyonu Oku">
     ~/.core/config/system.yaml varsa oku, şu değerleri çıkar:
     - platform
@@ -91,7 +95,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
   </step>
 
   <step n="4" name="Atlassian Bilgileri">
-    Şu bilgileri sırayla al:
+    Şu bilgileri SIRAYLA ve TEK TEK al — her soruyu ayrı mesajda sor, cevap gelmeden bir sonrakine geçme:
 
     a) Atlassian URL
        - Örnek: https://acme.atlassian.net
@@ -122,7 +126,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     Açıklama: "Domain, analizin odaklandığı iş alanıdır (örn: billing, fraud, onboarding, logistics).
     Küçük harf, tire veya alt çizgi kullanabilirsiniz. Bu isim dosya yolu olarak da kullanılır."
 
-    Şu bilgileri sırayla al:
+    Şu bilgileri SIRAYLA ve TEK TEK al — her soruyu ayrı mesajda sor, cevap gelmeden bir sonrakine geçme:
     a) Domain id (örn: billing, onboarding) → DOMAIN_ID
     b) Display adı (örn: Billing Services, Onboarding) → DOMAIN_DISPLAY
     c) Açıklama (kısa, 1-2 cümle) → DOMAIN_DESC
@@ -180,7 +184,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
   <step n="7" name="Kalite Eşikleri">
     Kullanıcıya: "Bilmiyorsanız varsayılanları kullanın — kurulum sonrası config/system.yaml'dan değiştirebilirsiniz."
 
-    Şu değerleri sırayla al (mevcut varsa göster, Enter ile korunsun):
+    Şu değerleri SIRAYLA ve TEK TEK al — her soruyu ayrı mesajda sor, cevap gelmeden bir sonrakine geçme (mevcut varsa göster, Enter ile korunsun):
 
     a) Halüsinasyon eşiği (0.0–1.0)
        - Not: "PRD Reviewer'ın doğrulanamayan bilgileri reddetme hassasiyeti. Yüksek = katı."
@@ -333,6 +337,43 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
     Her oluşturulan dosya için: "✓ [dosya adı] oluşturuldu" yaz.
     Zaten varsa: "— [dosya adı] mevcut, korundu" yaz.
+
+    9f. VS Code / Copilot platformlarında `.vscode/mcp.json` otomatik oluştur veya güncelle:
+    YALNIZCA platform = vscode veya copilot ise bu adımı uygula.
+
+    `.vscode/mcp.json` dosyasını oku (varsa).
+
+    **filesystem server mevcut değilse** → ekle/oluştur:
+    ```json
+    {
+      "servers": {
+        "filesystem": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-filesystem",
+            "${workspaceFolder}",
+            "~/.core"
+          ]
+        },
+        "atlassian-rovo": {
+          "url": "https://mcp.atlassian.com/v1/mcp",
+          "type": "http"
+        }
+      }
+    }
+    ```
+
+    Dosya zaten varsa ve `filesystem` server tanımlıysa: dokunma.
+    Dosya varsa ama `filesystem` yoksa: mevcut içeriğe `filesystem` bloğunu ekle, diğer serverlara dokunma.
+    Dosya yoksa: `.vscode/` klasörünü oluştur ve tam dosyayı yaz.
+
+    Sonuç:
+    - "✓ .vscode/mcp.json oluşturuldu (filesystem + atlassian-rovo)" veya
+    - "✓ .vscode/mcp.json güncellendi (filesystem eklendi)" veya
+    - "— .vscode/mcp.json mevcut, filesystem zaten tanımlı, korundu"
+
+    **Önemli:** VS Code'u yeniden başlatmadan MCP server aktif olmaz — kullanıcıyı bilgilendir.
   </step>
 
   <step n="10" name="MCP Kurulum Talimatları">
@@ -381,10 +422,15 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
     İlk bağlantıda tarayıcıda Atlassian OAuth girişi yapmanız istenecek.
 
     **Copilot:**
-    Proje kökünde `.vscode/mcp.json` oluştur:
+    `.vscode/mcp.json` adım 9f'de otomatik oluşturuldu/güncellendi.
+    İçeriği kontrol et — her iki server da tanımlı olmalı:
     ```json
     {
       "servers": {
+        "filesystem": {
+          "command": "npx",
+          "args": ["-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}", "~/.core"]
+        },
         "atlassian-rovo": {
           "url": "https://mcp.atlassian.com/v1/mcp",
           "type": "http"
@@ -392,7 +438,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
       }
     }
     ```
-    VS Code'u yeniden başlatın — Copilot Chat MCP bağlantısını otomatik kurar.
+    VS Code'u yeniden başlatın — Copilot Chat MCP bağlantılarını otomatik kurar.
     İlk bağlantıda tarayıcıda Atlassian OAuth girişi yapmanız istenecek.
   </step>
 
@@ -422,6 +468,7 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 </workflow>
 
 <rules>
+- **Karşılıklı sihirbaz modu:** Her adımda tek bir soru sor, cevap gel, sonra bir sonraki soruya geç. Asla birden fazla soruyu aynı anda listeleme.
 - Atlassian API token'ı hiçbir zaman dosyaya yazma — sadece MCP talimatlarında kullanıcıya göster
 - Mevcut değerleri koru — sadece kullanıcının değiştirdiği alanları güncelle
 - domain-context.yaml güncellenirken regulations, collaborating_boards alanlarına dokunma

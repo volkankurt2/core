@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Kurumsal hafızayı sorgula: karar geçmişi, mimari notlar, politikalar'
 ---
 

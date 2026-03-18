@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Ecosystem haritası oluştur: servisler, bağımlılıklar ve veri akışı'
 ---
 

@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Framework\'ü güncelle: agent, skill ve config dosyalarını son versiyona getir'
 ---
 

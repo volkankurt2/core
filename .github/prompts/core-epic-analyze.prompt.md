@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Epic analiz zinciri: tüm alt ticket\'ları kapsayan epic seviyesi analiz'
 ---
 

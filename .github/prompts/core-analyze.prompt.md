@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Standart analiz zinciri: Jira ticket analizini orchestrator ile çalıştır'
 ---
 

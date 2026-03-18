@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Geliştirici sorusunu yanıtla: Jira task veya teknik soru bağlamında danışmanlık'
 ---
 

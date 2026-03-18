@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-tools: ['codebase', 'terminal']
+agent: 'agent'
+tools: ['search/codebase']
 description: 'CORE — Yönetim sunumu üret: ticket analizinden PowerPoint-uyumlu slayt içeriği'
 ---
 
