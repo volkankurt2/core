@@ -59,6 +59,11 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
     ~/.core/memory/personal/ klasörü varsa, template.md hariç *.md dosyalarını listele → mevcut analistler.
 
+    **Knowledge-base tespiti:**
+    ~/.core/knowledge-base/ altında _progress.json ve _ecosystem_map.json hariç *.json dosyalarını listele.
+    Varsa → KB_FILES listesine al, ilerideki adımlarda kullanılacak.
+    Yoksa → KB_FILES boş.
+
     Mevcut değer olan her alan için: kullanıcıya "Mevcut: [değer] — Enter ile koru veya yeni değer gir" formatında göster.
   </step>
 
@@ -124,6 +129,37 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 
     Mevcut active_domain ve domain-context.yaml değerleri varsa göster.
     → Hemen kaydet: system.yaml `active_domain`, domain-context.yaml `domain/display_name/description` güncelle.
+
+    **5b — Knowledge-base'den Servis Otomatik Doldurma:**
+    KB_FILES doluysa (adım 1'de tespit edildiyse) şunu göster:
+
+    ```
+    ── Knowledge-base Tespit Edildi ─────────────────
+    [N] servis JSON dosyası bulundu:
+      • [dosya1-adı]
+      • [dosya2-adı]
+      ...
+    ─────────────────────────────────────────────────
+    domain-context.yaml > services bölümünü bu dosyalardan
+    otomatik doldurmamı ister misiniz? (E/h)
+    ```
+
+    Kullanıcı "E" veya Enter derse:
+    - Her KB JSON dosyası için şu alanları çıkar:
+        * id      → dosya adından (uzantısız, örn: payment)
+        * name    → repo.isim
+        * description → amac alanının ilk cümlesi (nokta veya virgüle kadar, max 120 karakter)
+        * tech    → meta.dil (örn: "java" → "Java / Spring Boot"; "dotnet" → ".NET / C#"; bilinmiyorsa meta.dil değeri)
+        * criticality → P1 (varsayılan; kullanıcı sonradan düzenler)
+        * owner_team  → "" (boş; kullanıcı sonradan düzenler)
+        * kb      → knowledge-base/[id].json
+    - domain-context.yaml'daki services bölümünü bu listeden oluştur.
+      Eğer services zaten doluysa: "Mevcut servisler var. Bunların üzerine yaz mı yoksa ekle mi? (üzerine yaz / ekle)"
+    - Her oluşturulan servis için: "✓ [id] eklendi" yaz.
+    - Kaydet: domain-context.yaml güncelle.
+
+    Kullanıcı "h" derse: bu adımı atla, services boş kalır.
+    KB_FILES boşsa: bu adımı tamamen atla.
   </step>
 
   <step n="6" name="Analist Profili">
@@ -370,8 +406,8 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
        - Yoksa: "⚠ Servis KB'si oluşturulmamış → /rk-scan [repo-url] çalıştırın"
 
     c) ~/.core/domains/[DOMAIN_ID]/domain-context.yaml → services boş mu?
-       - Boşsa VE knowledge-base/*.json YOKSA: "⚠ Domain servis listesi boş → /rk-scan [repo-url] çalıştırın, sonra /core-setup-boards services bölümünü otomatik doldurur"
-       - Boşsa VE knowledge-base/*.json VARSA: "⚠ Domain servis listesi boş → /core-setup-boards çalıştırın (KB mevcut, servisler otomatik doldurulacak)"
+       - Boşsa VE knowledge-base/*.json YOKSA: "⚠ Domain servis listesi boş → /rk-scan [repo-url] çalıştırın"
+       - Boşsa VE knowledge-base/*.json VARSA: "⚠ Domain servis listesi boş — KB mevcut ama doldurulmadı → /core-setup yeniden çalıştırın, adım 5b'de otomatik doldurma yapılır"
        - Doluysa: kontrol geçti
 
     Eksik yoksa: "✅ Tüm adımlar tamamlandı — /core-analyze [TICKET] ile başlayabilirsiniz"
@@ -388,7 +424,8 @@ Her platformdan (CLI, Desktop, VS Code, Copilot) çalışırsın.
 <rules>
 - Atlassian API token'ı hiçbir zaman dosyaya yazma — sadece MCP talimatlarında kullanıcıya göster
 - Mevcut değerleri koru — sadece kullanıcının değiştirdiği alanları güncelle
-- domain-context.yaml güncellenirken services, regulations, collaborating_boards alanlarına dokunma
+- domain-context.yaml güncellenirken regulations, collaborating_boards alanlarına dokunma
+- services alanı YALNIZCA adım 5b'de (KB'dan otomatik doldurma) kullanıcı onayıyla güncellenir; diğer adımlarda dokunma
 - Her adımı tamamladıkça kullanıcıya onay ver (✓ config/system.yaml, ✓ domains/[domain]/...) VE ilgili dosyayı hemen yaz — kurulum yarıda kesilebilir
 - Kurulum başlarken mevcut değerleri özet tablo olarak göster; kullanıcı "hayır" derse adımları atla
 - Copilot platformunda .github/copilot-instructions.md'yi mutlaka üret
