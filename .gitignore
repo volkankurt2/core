@@ -10,20 +10,20 @@
 logs/security/
 
 # ─────────────────────────────────────────────
-# Claude Code — .core/commands/ kaynak, .claude/commands/ kopya
+# Claude Code — .wise/commands/ kaynak, .claude/commands/ kopya
 # NOT: .claude/commands/ git'te takip edilir (bootstrap için gerekli —
-#      fresh clone'da /core-setup komutu hemen kullanılabilir olsun)
-# Güncelleme için: /core-sync
+#      fresh clone'da /wise-setup komutu hemen kullanılabilir olsun)
+# Güncelleme için: /wise-sync
 # ─────────────────────────────────────────────
 # .claude/commands/  ← gitignore'dan kaldırıldı, tracked
 
 # .github/copilot-instructions.md → git'te takip edilir (generic bootstrap)
-# /core-setup, domain bilgilerini bu dosyaya ekler; commit etmek isteğe bağlı.
+# /wise-setup, domain bilgilerini bu dosyaya ekler; commit etmek isteğe bağlı.
 .vscode/mcp.json
 
 # ─────────────────────────────────────────────
-# CORE — Kullanıcı/Şirket Verisi (Git'e commit ETME)
-# Bu dosyalar /core-setup kurulumu ve agent çalışmaları sırasında otomatik dolar.
+# WISE — Kullanıcı/Şirket Verisi (Git'e commit ETME)
+# Bu dosyalar /wise-setup kurulumu ve agent çalışmaları sırasında otomatik dolar.
 # Şirket-özel, analist-özel veya runtime veri içerirler.
 # ─────────────────────────────────────────────
 
@@ -31,17 +31,17 @@ logs/security/
 config/system.yaml
 
 # Analiz çıktıları — iş verileri içerir
-core-output/
+wise-output/
 
 # Knowledge base — repo tarama çıktıları (şirket kodu/mimarisi içerir)
 knowledge-base/
 
 # Domain pack'ler — şirkete özel servis listesi, regülasyon, board bilgisi içerir
-# Not: /domains/ (root-anchored) — .core/domains/_template/ etkilenmez
+# Not: /domains/ (root-anchored) — .wise/domains/_template/ etkilenmez
 /domains/
 
 # ─────────────────────────────────────────────
-# CORE — Kurumsal Hafıza (Runtime — Git'e commit ETME)
+# WISE — Kurumsal Hafıza (Runtime — Git'e commit ETME)
 # ─────────────────────────────────────────────
 
 # Kurumsal karar günlüğü — analizlerden biriken kararlar (template git'te kalır)
@@ -58,7 +58,7 @@ memory/feedback/feedback-log.md
 memory/agent-improvements/improvement-list.md
 !memory/agent-improvements/template.md
 
-# Prompt versiyon geçmişi ve A/B testler — /core-optimize çıktısı
+# Prompt versiyon geçmişi ve A/B testler — /wise-optimize çıktısı
 memory/prompt-versions/changelog.md
 memory/prompt-versions/ab-tests/ab-test-log.md
 

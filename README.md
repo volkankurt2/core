@@ -1,4 +1,4 @@
-# CORE — Company Ops Role Engine
+# WISE — Workflow Intelligence & Strategy Engine
 ### AI-Destekli Otonom İş Analiz Sistemi
 > Jira ticket'tan tam belgelenmiş geliştirme planına — tek komutla.
 
@@ -6,7 +6,7 @@
 
 ## Nedir?
 
-CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz eden,
+WISE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz eden,
 19 AI agent'tan oluşan otonom bir sistemdir. Her agent bir öncekinin çıktısını girdi olarak alır.
 
 **İki katmandan oluşur:**
@@ -22,7 +22,7 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 - Yönetim sunumu (PPTX) ve etki matrisi (Excel)
 
 **2. Repo Knowledge (RK)** — codebase'i tarayarak servis KB'si oluşturur:
-- Her servis için `~/.core/knowledge-base/[servis].json` — API'ler, bağımlılıklar, güvenlik riskleri
+- Her servis için `~/.wise/knowledge-base/[servis].json` — API'ler, bağımlılıklar, güvenlik riskleri
 - Cross-repo bağımlılık ve etki haritası (`_ecosystem_map.json`)
 - Geliştirici soruları için anlık yönlendirme
 
@@ -31,7 +31,7 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 ## Agent Zinciri (Analiz)
 
 ```
-/core-analyze PAY-1234
+/wise-analyze PAY-1234
         ↓
   Interview Agent        → 00-requirements-brief.md
   [Çelişki kontrolü ✓]
@@ -43,7 +43,7 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
    ONAY ↓   ↑ RED (maks 2 iterasyon)
         ↓ ✋ Handoff Onayı
   Codebase Analyst       → 04-impact-analysis.md
-  [~/.core/knowledge-base/*.json kaynak olarak kullanır]
+  [~/.wise/knowledge-base/*.json kaynak olarak kullanır]
         ↓ ✋ Handoff Onayı
   Implementation Planner → 05-user-stories.md + 06-test-scenarios.md + 07-implementation-plan.md
         ↓ ✋ Handoff Onayı (Atlassian yazma öncesi kritik)
@@ -59,11 +59,11 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 ```
 /rk-scan [repo-url]
         ↓
-  Repo Scanner     → ~/.core/knowledge-base/[servis].json
+  Repo Scanner     → ~/.wise/knowledge-base/[servis].json
         ↓
 /rk-map
         ↓
-  Ecosystem Mapper → ~/.core/knowledge-base/_ecosystem_map.json
+  Ecosystem Mapper → ~/.wise/knowledge-base/_ecosystem_map.json
         ↓
 /rk-advise [görev]
         ↓
@@ -77,16 +77,16 @@ CORE, iş taleplerini (Jira ticket veya serbest metin) alarak uçtan uca analiz 
 ### Adım 1 — Repo'yu Klonla
 
 ```bash
-git clone https://github.com/[kullanici]/CORE.git
-cd CORE
+git clone https://github.com/[kullanici]/WISE.git
+cd WISE
 ```
 
-### Adım 2 — /core-setup Çalıştır
+### Adım 2 — /wise-setup Çalıştır
 
 Claude Code veya Copilot Chat'ten kurulum sihirbazını başlatın:
 
 ```
-/core-setup
+/wise-setup
 ```
 
 Sihirbaz şunları sorar:
@@ -95,10 +95,10 @@ Sihirbaz şunları sorar:
 - Aktif domain (ör. `payment`)
 - Analist adı ve kalite eşikleri
 
-Sihirbaz biter bitmez tüm kullanıcı verisi `~/.core/` altına yazılır:
-- `~/.core/config/system.yaml`
-- `~/.core/domains/[domain]/domain-context.yaml`
-- `~/.core/memory/` altındaki hafıza dosyaları
+Sihirbaz biter bitmez tüm kullanıcı verisi `~/.wise/` altına yazılır:
+- `~/.wise/config/system.yaml`
+- `~/.wise/domains/[domain]/domain-context.yaml`
+- `~/.wise/memory/` altındaki hafıza dosyaları
 - MCP kurulum talimatları (platform'a göre exact komut/JSON) ekrana gösterilir
 
 ### Adım 3 — Servis KB'lerini Oluştur
@@ -116,7 +116,7 @@ Tüm servisleri taradıktan sonra:
 ### Adım 4 — İlk Analizi Çalıştır
 
 ```
-/core-analyze PAY-1234
+/wise-analyze PAY-1234
 ```
 
 ---
@@ -125,18 +125,18 @@ Tüm servisleri taradıktan sonra:
 
 | Claude Code | Copilot Chat | Açıklama |
 |-------------|--------------|----------|
-| `/core-analyze [ticket]` | `@core-analyze` | Standart analiz zinciri |
-| `/core-epic-analyze [ticket]` | `@core-epic-analyze` | Epic ölçekli analiz |
-| `/core-memory [konu]` | `@core-memory` | Kurumsal hafıza sorgusu |
-| `/core-tbd` | `@core-tbd` | Açık TBD'leri listele / güncelle |
-| `/core-pptx [ticket]` | `@core-pptx` | Yönetim sunumu (PPTX) |
-| `/core-excel [ticket]` | `@core-excel` | Teknik etki matrisi (Excel) |
-| `/core-optimize [agent?]` | `@core-optimize` | Agent prompt'larını optimize et |
-| `/core-analytics [N\|ticket]` | `@core-analytics` | Performans metrikleri |
-| `/core-help` | `@core-help` | Mevcut durumu analiz et |
-| `/core-setup` | `@core-setup` | Kurulum sihirbazı |
-| `/core-setup-boards` | `@core-setup-boards` | Jira board keşfi |
-| `/core-update` | `@core-update` | CORE framework'ünü güvenli güncelle |
+| `/wise-analyze [ticket]` | `@wise-analyze` | Standart analiz zinciri |
+| `/wise-epic-analyze [ticket]` | `@wise-epic-analyze` | Epic ölçekli analiz |
+| `/wise-memory [konu]` | `@wise-memory` | Kurumsal hafıza sorgusu |
+| `/wise-tbd` | `@wise-tbd` | Açık TBD'leri listele / güncelle |
+| `/wise-pptx [ticket]` | `@wise-pptx` | Yönetim sunumu (PPTX) |
+| `/wise-excel [ticket]` | `@wise-excel` | Teknik etki matrisi (Excel) |
+| `/wise-optimize [agent?]` | `@wise-optimize` | Agent prompt'larını optimize et |
+| `/wise-analytics [N\|ticket]` | `@wise-analytics` | Performans metrikleri |
+| `/wise-help` | `@wise-help` | Mevcut durumu analiz et |
+| `/wise-setup` | `@wise-setup` | Kurulum sihirbazı |
+| `/wise-setup-boards` | `@wise-setup-boards` | Jira board keşfi |
+| `/wise-update` | `@wise-update` | WISE framework'ünü güvenli güncelle |
 | `/rk-scan [repo-url]` | `@rk-scan` | Repo tara → knowledge-base |
 | `/rk-map` | `@rk-map` | Ekosistem haritası üret |
 | `/rk-advise [görev]` | `@rk-advise` | Geliştirici yönlendirmesi |
@@ -148,8 +148,8 @@ Tüm servisleri taradıktan sonra:
 **Repo (git ile versiyonlanır):**
 
 ```
-CORE/
-├── .core/
+WISE/
+├── .wise/
 │   ├── agents/          ← 19 agent (.agent.md) — tek kaynak
 │   ├── skills/          ← 10 skill (SKILL.md)
 │   └── prompts/         ← analiz giriş noktaları
@@ -162,14 +162,14 @@ CORE/
     └── */template.md    ← boş şablonlar (referans)
 ```
 
-**Kullanıcı verisi (`~/.core/` — git dışı, tüm platformlarda ortak):**
+**Kullanıcı verisi (`~/.wise/` — git dışı, tüm platformlarda ortak):**
 
 ```
-~/.core/
+~/.wise/
 ├── config/system.yaml          ← sistem konfigürasyonu
-├── domains/[domain-id]/        ← domain pack (/core-setup ile oluşturulur)
+├── domains/[domain-id]/        ← domain pack (/wise-setup ile oluşturulur)
 ├── memory/                     ← kurumsal hafıza (kararlar, TBD, feedback)
-├── core-output/                ← analiz çıktıları
+├── wise-output/                ← analiz çıktıları
 └── knowledge-base/             ← servis knowledge base (repo-scanner çıktısı)
 ```
 
@@ -177,20 +177,20 @@ CORE/
 
 ## Kurumsal Hafıza
 
-CORE, analiz süreçlerinde kurumsal bilgiyi üç katmanda yönetir:
+WISE, analiz süreçlerinde kurumsal bilgiyi üç katmanda yönetir:
 
-### Kalıcı Kararlar (`~/.core/memory/decisions/institutional-memory.md`)
+### Kalıcı Kararlar (`~/.wise/memory/decisions/institutional-memory.md`)
 
-Tüm analizlerde geçerli mimari ve iş kararları (KUR-NNN formatı). Yeni analiz başlarken CORE bu kararları otomatik tarar. Çelişki tespit edilirse:
+Tüm analizlerde geçerli mimari ve iş kararları (KUR-NNN formatı). Yeni analiz başlarken WISE bu kararları otomatik tarar. Çelişki tespit edilirse:
 - 🔴 **Kategori A** — Analiz durur, kullanıcı karar verir
 - 🟡 **Kategori B** — PRD'ye "Dikkat" bölümü eklenir
 - 🔵 **Kategori C** — "Geçmiş Referanslar" bölümüne eklenir
 
-### TBD Takibi (`~/.core/memory/tbd-tracker/tbd-tracker.md`)
+### TBD Takibi (`~/.wise/memory/tbd-tracker/tbd-tracker.md`)
 
 Analiz sırasında yanıtlanamayan sorular TBD olarak kaydedilir.
 
-### Kişisel Hafıza (`~/.core/memory/personal/[analist].md`)
+### Kişisel Hafıza (`~/.wise/memory/personal/[analist].md`)
 
 Her analistin tercihler, geçmiş puanlar ve geliştirilecek alanlar.
 
@@ -216,7 +216,7 @@ Her analistin tercihler, geçmiş puanlar ve geliştirilecek alanlar.
 ## Çıktı Yapısı
 
 ```
-~/.core/core-output/PAY-1234/
+~/.wise/wise-output/PAY-1234/
 ├── 00-requirements-brief.md
 ├── 01-prd.md
 ├── 02-brd.md
@@ -235,8 +235,8 @@ Her analistin tercihler, geçmiş puanlar ve geliştirilecek alanlar.
 | Dosya | Amaç |
 |-------|------|
 | `SETUP.md` | Kurulum rehberi ve kontrol listesi |
-| `~/.core/config/system.yaml` | Dil, platform, domain, kalite eşikleri |
-| `~/.core/domains/[domain]/domain-context.yaml` | Servisler, regülasyonlar, board'lar |
-| `~/.core/knowledge-base/_progress.json` | Hangi servisler tarandı? |
-| `~/.core/memory/decisions/institutional-memory.md` | Kurumsal kararlar (KUR-NNN) |
-| `~/.core/memory/tbd-tracker/tbd-tracker.md` | Açık belirsizlikler |
+| `~/.wise/config/system.yaml` | Dil, platform, domain, kalite eşikleri |
+| `~/.wise/domains/[domain]/domain-context.yaml` | Servisler, regülasyonlar, board'lar |
+| `~/.wise/knowledge-base/_progress.json` | Hangi servisler tarandı? |
+| `~/.wise/memory/decisions/institutional-memory.md` | Kurumsal kararlar (KUR-NNN) |
+| `~/.wise/memory/tbd-tracker/tbd-tracker.md` | Açık belirsizlikler |

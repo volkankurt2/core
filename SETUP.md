@@ -1,21 +1,21 @@
-# CORE — Kurulum Rehberi
+# WISE — Kurulum Rehberi
 
 ---
 
 ## Hızlı Kurulum (Önerilen)
 
 ```bash
-git clone https://github.com/[kullanıcı]/CORE.git
-cd CORE
+git clone https://github.com/[kullanıcı]/WISE.git
+cd WISE
 ```
 
 Ardından Claude Code veya Copilot Chat'ten kurulum sihirbazını başlatın:
 
 ```
-/core-setup
+/wise-setup
 ```
 
-`/core-setup` her şeyi `~/.core/` altına yazar — proje klasörüne dokunmaz.
+`/wise-setup` her şeyi `~/.wise/` altına yazar — proje klasörüne dokunmaz.
 
 ---
 
@@ -23,7 +23,7 @@ Ardından Claude Code veya Copilot Chat'ten kurulum sihirbazını başlatın:
 
 ### 1. MCP Bağlantısı (Zorunlu)
 
-Platform'a göre MCP yapılandırması `/core-setup` tarafından gösterilir. Manuel kurulum:
+Platform'a göre MCP yapılandırması `/wise-setup` tarafından gösterilir. Manuel kurulum:
 
 **Claude Desktop** — `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```json
@@ -63,7 +63,7 @@ API token: https://id.atlassian.com/manage-profile/security/api-tokens
 
 ### 2. Sistem Konfigürasyonu (Zorunlu)
 
-`/core-setup` ile otomatik oluşturulur: `~/.core/config/system.yaml`
+`/wise-setup` ile otomatik oluşturulur: `~/.wise/config/system.yaml`
 
 Manuel düzenleme gerekirse:
 
@@ -87,13 +87,13 @@ integrations:
 
 ### 3. Domain Kurulumu (Zorunlu)
 
-`/core-setup` ile otomatik oluşturulur: `~/.core/domains/[domain]/domain-context.yaml`
+`/wise-setup` ile otomatik oluşturulur: `~/.wise/domains/[domain]/domain-context.yaml`
 
 Manuel oluşturmak için şablonu kullanın:
 
 ```bash
-mkdir -p ~/.core/domains/[domain-id]
-cp .core/domains/_template/domain-context.yaml ~/.core/domains/[domain-id]/domain-context.yaml
+mkdir -p ~/.wise/domains/[domain-id]
+cp .wise/domains/_template/domain-context.yaml ~/.wise/domains/[domain-id]/domain-context.yaml
 ```
 
 `domain-context.yaml` içinde doldurulması gereken alanlar:
@@ -138,7 +138,7 @@ regulations:
 - `test_scenario_templates` — zorunlu test senaryosu şablonları
 - `glossary` — domain terimleri sözlüğü
 
-Şablon: `.core/domains/_template/domain-context.yaml`
+Şablon: `.wise/domains/_template/domain-context.yaml`
 
 - [ ] domain-context.yaml dolduruldu (jira_project, confluence_space, services, regulations)
 
@@ -146,7 +146,7 @@ regulations:
 
 ### 4. Servis Knowledge Base'leri (Önemli)
 
-Codebase Analyst, etki analizi için `~/.core/knowledge-base/*.json` dosyalarına ihtiyaç duyar.
+Codebase Analyst, etki analizi için `~/.wise/knowledge-base/*.json` dosyalarına ihtiyaç duyar.
 
 ```
 /rk-scan https://github.com/[org]/[servis-repo]
@@ -165,12 +165,12 @@ Tüm servisleri taradıktan sonra cross-repo haritayı üretin:
 
 ### 5. Analist Profili (Tavsiye)
 
-`/core-setup` ile otomatik oluşturulur: `~/.core/memory/personal/[isim].md`
+`/wise-setup` ile otomatik oluşturulur: `~/.wise/memory/personal/[isim].md`
 
 Manuel oluşturmak için:
 
 ```bash
-cp memory/personal/template.md ~/.core/memory/personal/[isim].md
+cp memory/personal/template.md ~/.wise/memory/personal/[isim].md
 ```
 
 - [ ] Analist profili oluşturuldu
@@ -179,7 +179,7 @@ cp memory/personal/template.md ~/.core/memory/personal/[isim].md
 
 ### 6. Confluence BRD Arşivi (Tavsiye)
 
-`.core/agents/jira-creator.agent.md` → Adım 5 → `parentId` alanını bulun.
+`.wise/agents/jira-creator.agent.md` → Adım 5 → `parentId` alanını bulun.
 Confluence'tan BRD Arşivi sayfasının ID'sini alıp yazın.
 _(Confluence → Sayfa → ... → Sayfa Bilgileri → URL'de `pageId=XXXXX`)_
 
@@ -189,8 +189,8 @@ _(Confluence → Sayfa → ... → Sayfa Bilgileri → URL'de `pageId=XXXXX`)_
 
 ### 7. Kurumsal Kararlar (Opsiyonel)
 
-`~/.core/memory/decisions/institutional-memory.md` — Ekibinizin bilinen mimari kararlarını,
-düzenleme yorumlarını ve standartlarını ekleyin. CORE her analizde bunları bağlam olarak kullanır.
+`~/.wise/memory/decisions/institutional-memory.md` — Ekibinizin bilinen mimari kararlarını,
+düzenleme yorumlarını ve standartlarını ekleyin. WISE her analizde bunları bağlam olarak kullanır.
 
 - [ ] Bilinen kurumsal kararlar eklendi
 
@@ -198,13 +198,13 @@ düzenleme yorumlarını ve standartlarını ekleyin. CORE her analizde bunları
 
 ### 8. Domain Customize Overlay (Opsiyonel)
 
-`.core/agents/` dosyalarını doğrudan düzenlemek yerine, şirkete özgü kuralları overlay katmanına yazın.
-Bu sayede `git pull` ile CORE güncellemesi yapabilirsiniz.
+`.wise/agents/` dosyalarını doğrudan düzenlemek yerine, şirkete özgü kuralları overlay katmanına yazın.
+Bu sayede `git pull` ile WISE güncellemesi yapabilirsiniz.
 
 ```bash
-mkdir -p ~/.core/domains/[domain-id]/customize
-cp .core/domains/_template/customize/_example.customize.yaml \
-   ~/.core/domains/[domain-id]/customize/prd.customize.yaml
+mkdir -p ~/.wise/domains/[domain-id]/customize
+cp .wise/domains/_template/customize/_example.customize.yaml \
+   ~/.wise/domains/[domain-id]/customize/prd.customize.yaml
 ```
 
 Overlay dosyası yapısı:
@@ -229,18 +229,18 @@ memories:
 
 Yalnızca bunları yaparsanız sistem çalışır:
 1. MCP bağlantısı (Madde 1)
-2. `/core-setup` → domain ve Jira anahtarları
-3. `/core-analyze [ticket-no]`
+2. `/wise-setup` → domain ve Jira anahtarları
+3. `/wise-analyze [ticket-no]`
 
 ---
 
 ## Yeni Domain Ekleme
 
 ```bash
-mkdir -p ~/.core/domains/[domain-id]
-cp .core/domains/_template/domain-context.yaml ~/.core/domains/[domain-id]/domain-context.yaml
+mkdir -p ~/.wise/domains/[domain-id]
+cp .wise/domains/_template/domain-context.yaml ~/.wise/domains/[domain-id]/domain-context.yaml
 # domain-context.yaml'ı düzenle
-# ~/.core/config/system.yaml → active_domain: [domain-id]
+# ~/.wise/config/system.yaml → active_domain: [domain-id]
 ```
 
 Kontrol listesi:
@@ -255,8 +255,8 @@ Kontrol listesi:
 
 **Repo (git):**
 ```
-CORE/
-├── .core/                   ← agent/skill/prompt — tek kaynak
+WISE/
+├── .wise/                   ← agent/skill/prompt — tek kaynak
 │   ├── agents/
 │   ├── skills/
 │   ├── prompts/
@@ -268,9 +268,9 @@ CORE/
 └── memory/*/template.md     ← boş şablonlar (referans)
 ```
 
-**Kullanıcı verisi (`~/.core/`):**
+**Kullanıcı verisi (`~/.wise/`):**
 ```
-~/.core/
+~/.wise/
 ├── config/system.yaml
 ├── domains/[domain-id]/
 │   ├── domain-context.yaml
@@ -280,7 +280,7 @@ CORE/
 │   ├── tbd-tracker/tbd-tracker.md
 │   ├── feedback/feedback-log.md
 │   └── personal/[analist].md
-├── core-output/[TICKET]/    ← analiz çıktıları
+├── wise-output/[TICKET]/    ← analiz çıktıları
 └── knowledge-base/          ← repo-scanner çıktısı
 ```
 
@@ -289,16 +289,16 @@ CORE/
 ## Sık Sorulan Sorular
 
 **Birden fazla domain destekliyor musunuz?**
-Evet. `~/.core/domains/` altına istediğiniz kadar domain ekleyebilirsiniz. `~/.core/config/system.yaml` içindeki `active_domain` değerini değiştirerek geçiş yapın.
+Evet. `~/.wise/domains/` altına istediğiniz kadar domain ekleyebilirsiniz. `~/.wise/config/system.yaml` içindeki `active_domain` değerini değiştirerek geçiş yapın.
 
 **Türkçe dışında dil kullanabilir miyim?**
-Evet. `~/.core/config/system.yaml` içinde `output_language: en` yapın.
+Evet. `~/.wise/config/system.yaml` içinde `output_language: en` yapın.
 
 **Jira olmadan kullanabilir miyim?**
 Evet, kısmi olarak. `integrations.jira.enabled: false` yapın. Jira Creator agent çalışmaz ama diğer agent'lar sorunsuz çalışır.
 
 **Sadece doküman üretmek, Atlassian'a yazmak istemiyorum.**
-`~/.core/config/system.yaml` içinde `integrations.dry_run: true` yapın veya analiz sırasında `--dry-run` argümanı kullanın.
+`~/.wise/config/system.yaml` içinde `integrations.dry_run: true` yapın veya analiz sırasında `--dry-run` argümanı kullanın.
 
 **`git pull` yaptım, verilerim kaybolur mu?**
-Hayır. Tüm kullanıcı verisi `~/.core/` altındadır — git repo'suyla ilgisi yoktur.
+Hayır. Tüm kullanıcı verisi `~/.wise/` altındadır — git repo'suyla ilgisi yoktur.

@@ -1,10 +1,10 @@
-# CORE — GitHub Copilot Talimatları
-# Company Ops Role Engine — AI-Destekli İş Analiz Sistemi
+# WISE — GitHub Copilot Talimatları
+# Workflow Intelligence & Strategy Engine — AI-Destekli İş Analiz Sistemi
 
-Bu proje CORE agent zincirini kullanır. Agent dosyaları `.core/` altında XML-in-Markdown
+Bu proje WISE agent zincirini kullanır. Agent dosyaları `.wise/` altında XML-in-Markdown
 formatında yazılmıştır. Her platform kendi MCP client'ını kullanır — araç adları sabit kodlanmamıştır.
 
-> **İlk kurulum:** `/core-setup` çalıştır → domain, Jira, Confluence yapılandırılır.
+> **İlk kurulum:** `/wise-setup` çalıştır → domain, Jira, Confluence yapılandırılır.
 
 ---
 
@@ -14,18 +14,18 @@ formatında yazılmıştır. Her platform kendi MCP client'ını kullanır — a
 
 | Agent | Açıklama |
 |-------|----------|
-| `@core-analyze` | Standart analiz zinciri |
-| `@core-epic-analyze` | Epic ölçekli analiz |
-| `@core-tbd` | Açık TBD'leri listele / güncelle |
-| `@core-memory` | Kurumsal hafıza sorgusu |
-| `@core-setup` | Kurulum sihirbazı |
-| `@core-setup-boards` | Jira board keşfi |
-| `@core-optimize` | Agent prompt optimizasyonu |
-| `@core-analytics` | Metrik ve kalite özeti |
-| `@core-excel` | Excel etki matrisi |
-| `@core-pptx` | Yönetim sunumu |
-| `@core-help` | Durum analizi ve yönlendirme |
-| `@core-update` | Framework güncelle |
+| `@wise-analyze` | Standart analiz zinciri |
+| `@wise-epic-analyze` | Epic ölçekli analiz |
+| `@wise-tbd` | Açık TBD'leri listele / güncelle |
+| `@wise-memory` | Kurumsal hafıza sorgusu |
+| `@wise-setup` | Kurulum sihirbazı |
+| `@wise-setup-boards` | Jira board keşfi |
+| `@wise-optimize` | Agent prompt optimizasyonu |
+| `@wise-analytics` | Metrik ve kalite özeti |
+| `@wise-excel` | Excel etki matrisi |
+| `@wise-pptx` | Yönetim sunumu |
+| `@wise-help` | Durum analizi ve yönlendirme |
+| `@wise-update` | Framework güncelle |
 | `@rk-scan` | Repo tara → knowledge-base |
 | `@rk-map` | Ekosistem haritası üret |
 | `@rk-advise` | Geliştirici sorusu yanıtla |
@@ -36,9 +36,9 @@ formatında yazılmıştır. Her platform kendi MCP client'ını kullanır — a
 
 Bir Jira ticket ID'si veya "X'i analiz et" talebi geldiğinde:
 
-1. `.core/agents/orchestrator.agent.md` dosyasını oku
+1. `.wise/agents/orchestrator.agent.md` dosyasını oku
 2. `<workflow>` bloğunu adım adım uygula
-3. Her adımda ilgili `.core/agents/[agent-id].agent.md` dosyasını oku
+3. Her adımda ilgili `.wise/agents/[agent-id].agent.md` dosyasını oku
 4. Atlassian MCP araçlarıyla Jira/Confluence işlemlerini gerçekleştir
 
 ---
@@ -69,21 +69,21 @@ Feedback Collector     → memory/ güncelle
 
 | Tür | Konum |
 |-----|-------|
-| Agent'lar (13) | `.core/agents/*.agent.md` |
-| Skill'ler (9) | `.core/skills/*/SKILL.md` |
-| Prompt'lar | `.core/prompts/` |
-| Komutlar | `.core/commands/` |
+| Agent'lar (13) | `.wise/agents/*.agent.md` |
+| Skill'ler (9) | `.wise/skills/*/SKILL.md` |
+| Prompt'lar | `.wise/prompts/` |
+| Komutlar | `.wise/commands/` |
 | Domain config | `domains/[domain-id]/domain-context.yaml` |
 | Sistem config | `config/system.yaml` |
 | Knowledge Base | `knowledge-base/[servis].json` |
-| Çıktılar | `core-output/[TICKET-ID]/` |
+| Çıktılar | `wise-output/[TICKET-ID]/` |
 
 ---
 
 ## Konfigürasyon
 
 `config/system.yaml` ve `domains/[domain-id]/domain-context.yaml` dosyaları
-`/core-setup` ile yapılandırılır (gitignored — şirket verisi içerir).
+`/wise-setup` ile yapılandırılır (gitignored — şirket verisi içerir).
 
 Ayarlar okunmamışsa yine de çalış; kullanıcıya eksik bilgileri sor.
 

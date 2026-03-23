@@ -1,8 +1,9 @@
 ---
 agent: 'agent'
 tools: ['search/codebase']
-description: 'CORE — Ecosystem haritası oluştur: servisler, bağımlılıklar ve veri akışı'
+description: 'WISE — Ecosystem haritası oluştur: servisler, bağımlılıklar ve veri akışı'
 ---
 
-#file:.core/agents/ecosystem-mapper.agent.md dosyasını oku.
+#file:.wise/agents/ecosystem-mapper.agent.md
+Tüm `<activation>`, `<workflow>`, `<rules>` bloklarını adım adım uygula.
 Tüm `<activation>`, `<workflow>`, `<rules>` bloklarını adım adım uygula.

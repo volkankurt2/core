@@ -1,6 +1,6 @@
 # Kurumsal Hafıza — Karar Günlüğü
 # Tüm analistlerin paylaştığı birikimli bilgi.
-# Her analiz sonunda CORE tarafından güncellenir.
+# Her analiz sonunda WISE tarafından güncellenir.
 #
 # KURULUM: Bu şablonu kopyalayarak oluştur:
 #   cp memory/decisions/template.md memory/decisions/institutional-memory.md
@@ -28,13 +28,13 @@ veya edge case standardı ise ekle.
 - **Gerekçe:** [Neden]
 - **Kapsam:** [Hangi sistemler için geçerli]
 - **İstisna:** [Geçerli olmadığı durumlar]
-- **Yazan:** [Analist adı veya "CORE"]
+- **Yazan:** [Analist adı veya "WISE"]
 ```
 
 ---
 
 ## Kararlar
 
-*(Henüz karar eklenmedi — ilk analiz tamamlandıktan sonra CORE tarafından otomatik doldurulur)*
+*(Henüz karar eklenmedi — ilk analiz tamamlandıktan sonra WISE tarafından otomatik doldurulur)*
 
-# ↓ YENİ KARARLAR BURAYA EKLENİR — CORE tarafından otomatik ↓
+# ↓ YENİ KARARLAR BURAYA EKLENİR — WISE tarafından otomatik ↓

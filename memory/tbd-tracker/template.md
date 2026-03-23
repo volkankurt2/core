@@ -1,7 +1,7 @@
 # TBD Takip Defteri
 # Hiç kapanmamış açık kararların merkezi listesi.
 # Her analizde üretilen TBD'ler buraya eklenir.
-# Haftalık gözden geçirilmeli: /core-tbd
+# Haftalık gözden geçirilmeli: /wise-tbd
 #
 # KURULUM: Bu şablonu kopyalayarak oluştur:
 #   cp memory/tbd-tracker/template.md memory/tbd-tracker/tbd-tracker.md
@@ -34,7 +34,7 @@ son_guncelleme: ''
 
 ## Açık TBD'ler
 
-*(Analiz tamamlandıkça CORE tarafından otomatik doldurulur)*
+*(Analiz tamamlandıkça WISE tarafından otomatik doldurulur)*
 
 ## Çözülmüş TBD'ler
 

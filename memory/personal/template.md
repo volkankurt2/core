@@ -10,7 +10,7 @@ created: 'YYYY-AA-GG'
 
 ## Benim Stilim
 
-*(CORE tarafından analizlerden öğrenilerek doldurulur)*
+*(WISE tarafından analizlerden öğrenilerek doldurulur)*
 
 ### Tercih Ettiğim Yaklaşımlar
 - *(örn: "Yasal riskleri her zaman önce belgeler")*
